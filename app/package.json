@@ -9,7 +9,7 @@
     "build_docs": "apidoc -i ./routes/ -o public/apidoc/"
   },
   "dependencies": {
-    "body-parser": "2.2.2",
+    "body-parser": "2.4.0",
     "cookie-parser": "1.4.7",
     "cross-env": "10.1.0",
     "date-and-time": "4.3.1",
@@ -19,9 +19,9 @@
     "form-urlencoded": "6.1.6",
     "js2xmlparser": "5.0.0",
     "lokijs": "^1.5.12",
-    "morgan": "1.10.1",
+    "morgan": "1.12.1",
     "pug": "3.0.4",
-    "uuid": "13.0.0",
+    "uuid": "13.0.2",
     "validate.js": "0.13.1",
     "xml2js": "0.6.2"
   },

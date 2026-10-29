@@ -43,7 +43,8 @@
     ],
     "hallazgos_de_la_sesion": [
       "Tres pruebas existentes de tests/spec.js afirman el comportamiento defectuoso (aceptar el Basic hardcodeado en PUT y DELETE, y responder 405 al borrar un id inexistente). La suite 'pasaba en verde' precisamente porque protegía los defectos. Se decide reescribirlas junto con la corrección.",
-      "POST /booking responde 500 (error de servidor) cuando la validación falla, en lugar de 400. Se registra como observación para backlog (P4), sin código propio en este ciclo, porque cambiarlo rompe el contrato con clientes existentes y requiere acordarlo."
+      "POST /booking responde 500 (error de servidor) cuando la validación falla, en lugar de 400. Se registra como observación para backlog (P4), sin código propio en este ciclo, porque cambiarlo rompe el contrato con clientes existentes y requiere acordarlo.",
+      "Hallazgo del propio pipeline: al implementar el gate G2, npm audit detectó 7 vulnerabilidades en dependencias de producción (1 crítica en proxy-addr, 2 altas en body-parser y path-to-regexp). Se corrigieron con actualizaciones minor/patch (npm audit fix; body-parser 2.4.0, morgan 1.12.1, uuid 13.0.2) y la suite siguió en verde. Queda una moderada en validate.js sin parche disponible: riesgo aceptado bajo el umbral 'high' y mitigado por la acción A-07 (reemplazar validate.js por un esquema JSON)."
     ]
   },
   "defectos": [
@@ -99,8 +100,8 @@
         "justificacion": "Vulnerabilidad de seguridad explotable con información pública y sin workaround. Importante y urgente: se hace primero.",
         "criterio_cierre": "La prueba de regresión 'D-001' pasa (PUT/PATCH/DELETE con el header Basic → 403; con token válido → 200/201) y el escaneo de secretos (gitleaks) no reporta credenciales en el código."
       },
-      "status": "open",
-      "fecha_cierre": null,
+      "status": "resolved",
+      "fecha_cierre": "2026-10-30",
       "regression_test": "D-001",
       "cinco_porques": [
         {
@@ -183,7 +184,7 @@
         {
           "id": "A-01",
           "tipo": "Corrección",
-          "accion": "Eliminar la aceptación del header Basic hardcodeado; autorizar solo con el token de /auth en un middleware único `requireAuth`",
+          "accion": "Eliminar la aceptación del header Basic hardcodeado; autorizar solo con el token de /auth mediante una única función isAuthorised (routes/index.js) y dejar de publicar la credencial en la apidoc",
           "responsable": "Camilo Rivera",
           "impacto": "Alto",
           "esfuerzo": "Bajo",
@@ -259,8 +260,8 @@
         "justificacion": "Se propuso P2, pero el comité la sube a P1: corrompe datos de negocio en cada uso, es 100 % reproducible y su corrección es de esfuerzo bajo.",
         "criterio_cierre": "La prueba de regresión 'D-002' pasa (fechas invertidas o iguales → rechazo; fechas válidas → 200) y el smoke k6 sigue en verde."
       },
-      "status": "open",
-      "fecha_cierre": null,
+      "status": "resolved",
+      "fecha_cierre": "2026-10-30",
       "regression_test": "D-002",
       "cinco_porques": [
         {
@@ -405,8 +406,8 @@
         "justificacion": "Se reclasifica de Media a Alta: no es solo falta de validación, hay pérdida silenciosa de datos financieros (pérdida económica explícita). Sin workaround → P1.",
         "criterio_cierre": "La prueba de regresión 'D-003' pasa (negativo y no numérico → rechazo; 0 y valores positivos → 200)."
       },
-      "status": "open",
-      "fecha_cierre": null,
+      "status": "resolved",
+      "fecha_cierre": "2026-10-30",
       "regression_test": "D-003",
       "cinco_porques": [
         {
@@ -691,8 +692,8 @@
         "justificacion": "Impacto bajo y no urgente (P3), pero de esfuerzo muy bajo y en el mismo handler que el hotfix D-001: se adelanta como quick win (impacto bajo / esfuerzo bajo).",
         "criterio_cierre": "La prueba de regresión 'D-005' pasa (DELETE de un id inexistente → 404)."
       },
-      "status": "open",
-      "fecha_cierre": null,
+      "status": "resolved",
+      "fecha_cierre": "2026-10-30",
       "regression_test": "D-005",
       "cinco_porques": [
         {
