@@ -2,33 +2,41 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## What this folder is
+## What this repo is
 
-This is not a software project: there is no code, build, lint or test tooling, and it is not a git repository. It is the workspace for **Actividad 5** of the university course *Calidad en Software* (Universidad de La Salle, UnisalleVirtual/Moodle). It is a team assignment (max 3 people), due **Sunday 2026-11-01, 23:59**. All deliverables are written in **Spanish**.
+Deliverable for **Actividad 5** of *Calidad en Software II* (Universidad de La Salle; team Camilo Rivera Quintero + Karen Torres; due 2026-11-01). The assignment asks for a defect triage record, root-cause analysis (5 Whys + Ishikawa), an improvement plan and CI/CD quality gates. The rubric is in `actividad_5.pdf` and the class guidance is in the `10-29 Clase_…` summary/transcript. Everything user-facing is written in **Spanish**.
 
-Source material:
-- `actividad_5.pdf`: the official assignment statement and grading rubric (the source of truth for requirements).
-- `10-29 Clase_ ... -Summary.md`: structured summary of the 2026-10-29 class, where the teacher explained what is expected. It holds the recommended table formats, severity/priority scales and KPI examples.
-- `10-29 Clase_ ... -transcript.txt`: raw transcript of that class (auto-transcribed, contains errors such as "baglio" → backlog, "campage" → KPIs). Use the Summary first; check the transcript only to confirm a detail.
+The system under test is **Restful-Booker** (Node/Express + in-memory LokiJS). `app/` is a copy of `../restful-booker`, the repo used for activities 2–4. The defects are real ones found in activity 2 (DEF-01..04, R1) and are renumbered here as **D-001..D-005**.
 
-## Required deliverables
+## Architecture: one data source drives everything
 
-1. **Acta de triage**: ≥ 3 critical/high-impact defects, with agreed severity/priority, owner and dates.
-2. **Análisis causa-raíz** per defect: **5 Whys + Ishikawa**, with linked evidence, separating verifiable causes from assumptions still to validate.
-3. **Plan de mejora**: table of actions prioritized by impact/effort, with owner, effort (bajo/medio/alto) and a verification KPI/threshold.
-4. **Propuesta técnica de Quality Gates / CI-CD**: rules and thresholds (e.g. error rate ≤ X %, latency P95 ≤ Y ms, minimum smoke coverage), fail-fast policy, recommended tools and why they were chosen.
+`triage/defects.json` is the single source of truth: the triage session, the defects with their evidence, the agreed severity/priority, the 5 Whys, the Ishikawa causes (marked `verificada` or `suposición`), the actions with KPIs, and the gates G1–G7. Everything else is derived from it:
 
-Rubric weights (5 points total): triage 1, root-cause analysis **2** (the heaviest: rigor, evidence, verifiability), improvement plan 1, CI/CD integration 1 (graded on "evidence (pipeline/MR) and traceability").
+- `triage/triage.py validate`: checks rubric completeness (exit 1 if anything is missing).
+- `triage/triage.py gate`: **quality gate G1**. Fails if any P1 defect isn't `resolved`, or if a resolved defect has no `it('D-00X …')` in `app/tests/regression.spec.js`.
+- `triage/triage.py report` / `diagrams`: write `informe/generado.md` and `informe/img/*.png` (diagrams need matplotlib).
+- `informe/build.sh`: generated sections + hand-written `00_intro.md` / `90_propuesta.md` → DOCX (Homebrew pandoc at `/opt/homebrew/bin/pandoc`; the Anaconda pandoc is an x86 binary and fails) and PDF (Chrome headless, `estilo.css`).
 
-## Expectations the teacher stated in class
+When a defect changes, edit `defects.json` and rebuild. Don't hand-edit `informe/generado.md`.
 
-- Prefer **one integrated report** with a clear narrative thread rather than separate disconnected files. Suggested outline: Introducción → Objetivo → Entradas (defectos y evidencias) → Acta de triage → Análisis causa-raíz → Plan de mejora → Quality Gates propuestos → Propuesta técnica de automatización → Anexos.
-- Defects may be synthetic/simulated, but must be coherent and plausible; evidence can be steps, logs, stack traces, screenshots, HTTP errors, k6/Grafana metrics (ties to earlier course activities on performance testing).
-- **Traceability is the core idea**: every defect gets a code (`D-001`, `D-002`, …) that is reused in the acta, the root-cause analysis, each improvement action, each KPI and each Quality Gate.
-- Keep severity (how bad) and priority (how soon) distinct, and justify both. Scales used in class: severity Baja/Media/Alta/Crítica; priority P1 (immediately), P2 (current cycle), P3 (next sprint), P4 (backlog). Consider urgency, reproducibility, scope and any **workaround**.
-- The acta should also record the triage **decision** (hotfix, release, backlog, investigation, close) and a **criterio de cierre** (how the fix is verified: regression, smoke, functional tests).
-- Ishikawa categories adapted to software: personas, procesos, herramientas, entornos, datos, código, diseño.
-- Example KPI thresholds from class: error rate < 1 %, latency P95 < 300 ms, all critical flows covered by smoke tests, ≥ 80 % new-code coverage, 0 critical/blocker issues, new-code duplication < 3 % (SonarQube-style quality gate conditions).
-- Each Quality Gate must state what it measures, the threshold, why that threshold, and what happens when it fails (pipeline blocks). A fully working pipeline is not required, but a working pilot (even for a single defect, shown with screenshots or a pipeline run) is extra credit.
+## Commands
 
-Readings referenced by the assignment: ISTQB Advanced Test Manager v3.0 (defect management), Google SRE blameless postmortems, ASQ 5 Whys, NHS Ishikawa guide, SonarQube Quality Gates.
+```bash
+cd app && npm ci                         # first time
+cd app && npm test                       # mocha: tests/spec.js + tests/regression.spec.js
+cd app && npx mocha tests/regression.spec.js -g "D-002"   # one defect's regression tests
+cd app && npm run coverage               # c8, fails under 80 % lines (gate G4)
+bash ci/run_gates.sh [log]               # all gates locally, fail-fast
+FAIL_FAST=0 bash ci/run_gates.sh         # diagnostic: run every gate, report each
+bash informe/build.sh                    # regenerate the report (DOCX + PDF)
+```
+
+Local gates require `gitleaks`, `k6`, Python 3 and Node 22. `.github/workflows/quality-gate.yml` runs the same gates in the same order: estático (G1, G2) → pruebas (G3, G4) → rendimiento (G5, docker + k6) → despliegue (G6, simulated, only on main).
+
+## Gotchas
+
+- Regression tests must send `Accept: application/json` (use `createBooking`). Without it the API returns 418 before validation, and a "should reject" test passes for the wrong reason.
+- Rejected bookings return **500** on POST (pre-existing behavior, logged as a P4 observation in the acta). That's why tests assert `status >= 400` instead of 400. PUT returns 400.
+- D-004 (overlapping bookings) is deliberately open as Crítica/P2. Its test is `it.skip`, so G1 doesn't block on it.
+- `.gitleaks.toml` has a custom `hardcoded-basic-auth` rule. `tests/` is allowlisted because the regression tests use that credential on purpose.
+- Git history is part of the evidence: commit `02c4ced` is the red state and `2389430` the green fix. Logs are in `triage/evidencia/pipeline_0{1,2}_*.log`. The report cites these hashes, so don't rewrite history.
