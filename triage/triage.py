@@ -23,6 +23,7 @@ INFORME = ROOT / "informe"
 SEVERIDADES = ["Crítica", "Alta", "Media", "Baja"]
 PRIORIDADES = ["P1", "P2", "P3", "P4"]
 NIVEL = {"Alto": 3, "Medio": 2, "Bajo": 1}
+ESTADO = {"resolved": "Resuelto", "open": "Abierto"}
 
 
 def load():
@@ -51,9 +52,9 @@ def prioridad_matriz(impacto, urgencia):
 def cuadrante(accion):
     imp, esf = NIVEL[accion["impacto"]], NIVEL[accion["esfuerzo"]]
     if imp >= 2 and esf == 1:
-        return 1, "Quick win (alto impacto / bajo esfuerzo)"
+        return 1, "Quick win (impacto alto/medio, esfuerzo bajo)"
     if imp >= 2:
-        return 2, "Proyecto planificado (alto impacto / alto esfuerzo)"
+        return 2, "Proyecto planificado (impacto alto/medio, esfuerzo medio/alto)"
     if esf == 1:
         return 3, "Mejora rápida si hay capacidad"
     return 4, "Baja prioridad"
@@ -138,8 +139,10 @@ def cmd_gate(data):
 
 
 # ------------------------------------------------------------------ report
-def tabla(headers, rows):
-    out = ["| " + " | ".join(headers) + " |", "|" + "---|" * len(headers)]
+def tabla(headers, rows, widths=None):
+    """Tabla Markdown; widths (pesos relativos) controla el ancho de columna en DOCX/PDF."""
+    widths = widths or [1] * len(headers)
+    out = ["| " + " | ".join(headers) + " |", "|" + "|".join("-" * (w * 6) for w in widths) + "|"]
     for r in rows:
         out.append("| " + " | ".join(str(c).replace("|", "\\|").replace("\n", " ") for c in r) + " |")
     return "\n".join(out)
@@ -152,7 +155,8 @@ def cmd_report(data):
 
     md.append("# Entradas: defectos y evidencias\n")
     md.append("Los defectos provienen de la ejecución real del Master Test Plan de la Actividad 2 sobre Restful-Booker. "
-              "Cada uno conserva su código de origen para mantener la trazabilidad entre actividades.\n")
+              "Cada uno conserva su código de origen para mantener la trazabilidad entre actividades. "
+              "Las referencias `archivo:línea` corresponden al código original, antes de las correcciones (commit `02c4ced`).\n")
     md.append(tabla(
         ["Código", "Origen", "Descripción", "Impacto principal", "Reproducibilidad", "Alcance", "Sev. propuesta", "Prio. inicial"],
         [[d["id"], d["origen"], d["titulo"], d["impacto"], d["reproducibilidad"], d["alcance"],
@@ -165,7 +169,7 @@ def cmd_report(data):
         md.append("**Pasos para reproducir:** " + " → ".join(d["pasos"]) + "\n")
         md.append(f"**Resultado esperado:** {d['esperado']}  \n**Resultado obtenido:** {d['obtenido']}\n")
         md.append(tabla(["Tipo", "Referencia", "Qué muestra"],
-                        [[e["tipo"], f"`{e['ref']}`", e["resumen"]] for e in d["evidencia"]]))
+                        [[e["tipo"], f"`{e['ref']}`", e["resumen"]] for e in d["evidencia"]], [2, 6, 7]))
         md.append("")
 
     md.append("# Acta de triage\n")
@@ -182,7 +186,7 @@ def cmd_report(data):
         md.append(f"- {c}")
     md.append("\n**Decisiones acordadas:**\n")
     md.append(tabla(
-        ["Código", "Sev. acordada", "Prio. acordada", "Impacto × urgencia", "Responsable", "Decisión", "Fecha compromiso", "Workaround", "Criterio de cierre"],
+        ["Código", "Sev. acordada", "Prio. acordada", "Impacto × urgencia (matriz)", "Responsable", "Decisión", "Fecha compromiso", "Workaround", "Criterio de cierre"],
         [[d["id"], d["triage"]["severidad"], d["triage"]["prioridad"],
           f"{d['triage']['impacto']}×{d['triage']['urgencia']} → {prioridad_matriz(d['triage']['impacto'], d['triage']['urgencia'])}",
           d["triage"]["responsable"], d["triage"]["decision"], d["triage"]["fecha_compromiso"],
@@ -198,7 +202,7 @@ def cmd_report(data):
         md.append(f"- {h}")
     md.append("\n**Seguimiento del estado:**\n")
     md.append(tabla(["Código", "Estado", "Fecha de cierre", "Prueba de regresión"],
-                    [[d["id"], d["status"], d.get("fecha_cierre") or "—", d["regression_test"]] for d in defs]))
+                    [[d["id"], ESTADO.get(d["status"], d["status"]), d.get("fecha_cierre") or "—", d["regression_test"]] for d in defs]))
     md.append("")
 
     md.append("# Análisis de causa raíz\n")
@@ -210,7 +214,7 @@ def cmd_report(data):
         md.append(f"## {d['id']} — {d['titulo']}\n")
         md.append("**5 porqués**\n")
         md.append(tabla(["#", "Pregunta", "Respuesta"],
-                        [[i + 1, w["pregunta"], w["respuesta"]] for i, w in enumerate(d["cinco_porques"])]))
+                        [[i + 1, w["pregunta"], w["respuesta"]] for i, w in enumerate(d["cinco_porques"])], [1, 8, 12]))
         md.append(f"\n**Causa raíz:** {d['causa_raiz']}\n")
         md.append("**Diagrama de Ishikawa**\n")
         md.append(f"![Ishikawa {d['id']}](img/ishikawa_{d['id']}.png){{width=100%}}\n")
@@ -218,7 +222,7 @@ def cmd_report(data):
         for cat, causas in d["ishikawa"].items():
             for c in causas:
                 rows.append([cat, c["causa"], "Verificada" if c["tipo"] == "verificada" else "Suposición por validar", c["evidencia"]])
-        md.append(tabla(["Categoría", "Causa", "Estado", "Evidencia / cómo validar"], rows))
+        md.append(tabla(["Categoría", "Causa", "Estado", "Evidencia / cómo validar"], rows, [2, 6, 3, 6]))
         md.append("")
 
     md.append("# Plan de mejora\n")
@@ -246,7 +250,7 @@ def cmd_report(data):
     md.append(tabla(
         ["Defecto", "Evidencia", "Sev./Prio.", "Causa raíz", "Acciones", "Prueba de regresión", "Gates", "Estado"],
         [[d["id"], d["evidencia"][0]["ref"], f"{d['triage']['severidad']}/{d['triage']['prioridad']}", d["causa_raiz"],
-          ", ".join(a["id"] for a in d["acciones"]), d["regression_test"], ", ".join(gates_por_def[d["id"]]), d["status"]]
+          ", ".join(a["id"] for a in d["acciones"]), d["regression_test"], ", ".join(gates_por_def[d["id"]]), ESTADO.get(d["status"], d["status"])]
          for d in defs]))
     md.append("")
 

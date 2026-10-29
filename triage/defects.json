@@ -69,7 +69,7 @@
         {
           "tipo": "código",
           "ref": "app/routes/index.js:434, :560, :615",
-          "resumen": "Condición `globalLogins[token] || req.headers.authorization == 'Basic YWRt…'` repetida en los tres handlers"
+          "resumen": "Condición que acepta el token de sesión o el literal 'Basic YWRt…', repetida en los tres handlers"
         },
         {
           "tipo": "prueba",
@@ -689,7 +689,7 @@
         "decision": "Quick win: se corrige junto con D-001 porque toca el mismo handler",
         "fecha_compromiso": "2026-11-10",
         "workaround": "Los clientes pueden tratar el 405 de DELETE como 'no existe'.",
-        "justificacion": "Impacto bajo y no urgente (P3), pero de esfuerzo muy bajo y en el mismo handler que el hotfix D-001: se adelanta como quick win (impacto bajo / esfuerzo bajo).",
+        "justificacion": "La matriz impacto × urgencia (2×2) sugiere P4 (backlog). El comité la sube a P3 porque rompe la automatización de los clientes de integración, y además la corrige como quick win dentro del hotfix de D-001: toca el mismo handler y el esfuerzo es mínimo (impacto bajo / esfuerzo bajo).",
         "criterio_cierre": "La prueba de regresión 'D-005' pasa (DELETE de un id inexistente → 404)."
       },
       "status": "resolved",
