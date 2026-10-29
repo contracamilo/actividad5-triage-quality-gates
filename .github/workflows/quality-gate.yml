@@ -1,0 +1,107 @@
+# Quality gates de la Actividad 5 (mismos gates y orden que ci/run_gates.sh).
+# Fail-fast: cada etapa depende de la anterior (needs) y va de lo más barato a lo más caro;
+# si un gate falla, las etapas siguientes y el despliegue no se ejecutan.
+name: Quality Gates
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '22'
+  GITLEAKS_VERSION: '8.30.1'
+
+jobs:
+  estatico:
+    name: G1 triage + G2 secretos y dependencias
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: G1 — Validar el acta (completitud contra la rúbrica)
+        run: python3 triage/triage.py validate
+
+      - name: G1 — Gate de triage (0 defectos P1 abiertos, resueltos con prueba de regresión)
+        run: python3 triage/triage.py gate
+
+      - name: G2 — Escaneo de secretos (gitleaks)
+        run: |
+          curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz gitleaks
+          ./gitleaks dir app --config .gitleaks.toml --no-banner --redact
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: G2 — Vulnerabilidades en dependencias (sin high/critical)
+        working-directory: app
+        run: npm audit --omit=dev --audit-level=high
+
+  pruebas:
+    name: G3 regresión + G4 cobertura
+    needs: estatico
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+        working-directory: app
+
+      - name: G3 + G4 — Pruebas unitarias y de regresión D-00X con cobertura ≥ 80 %
+        working-directory: app
+        run: npm run coverage
+
+      - name: Publicar reporte de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura
+          path: app/coverage/
+
+  rendimiento:
+    name: G5 smoke de rendimiento (k6)
+    needs: pruebas
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construir y levantar la API
+        working-directory: app
+        run: |
+          docker build -t restful-booker:${{ github.sha }} .
+          docker run -d --name api -p 3001:3001 restful-booker:${{ github.sha }}
+          for i in $(seq 1 30); do curl -sf http://localhost:3001/ping && exit 0; sleep 2; done
+          docker logs api; exit 1
+
+      - uses: grafana/setup-k6-action@v1
+
+      - name: G5 — k6 (error < 1 %, p95 < 300 ms, checks > 99 %)
+        run: k6 run --summary-export k6-summary.json ci/k6_smoke.js
+
+      - name: Publicar resumen k6
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-smoke
+          path: k6-summary.json
+
+  despliegue:
+    name: G6 despliegue condicionado
+    needs: [estatico, pruebas, rendimiento]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construir la imagen candidata (despliegue simulado)
+        working-directory: app
+        run: |
+          docker build -t restful-booker:release-${{ github.sha }} .
+          echo "Todos los quality gates aprobados: imagen restful-booker:release-${{ github.sha }} lista para desplegar." >> "$GITHUB_STEP_SUMMARY"
