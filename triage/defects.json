@@ -1,0 +1,880 @@
+{
+  "proyecto": {
+    "nombre": "Restful-Booker — Actividad 5: triage, causa raíz y mejora continua",
+    "curso": "Calidad en Software II — Universidad de La Salle",
+    "sistema": "Restful-Booker (API REST Node.js/Express + LokiJS en memoria), mismo sistema bajo prueba de las actividades 2, 3 y 4",
+    "equipo": [
+      "Camilo Rivera Quintero",
+      "Karen Torres"
+    ]
+  },
+  "sesion": {
+    "fecha": "2026-10-30",
+    "modalidad": "Sesión de triage virtual (60 min)",
+    "asistentes": [
+      {
+        "nombre": "Camilo Rivera Quintero",
+        "rol": "Moderador del comité de triage / QA lead; responsable técnico de backend y CI"
+      },
+      {
+        "nombre": "Karen Torres",
+        "rol": "Analista de calidad y desarrolladora; registro del acta y validación funcional"
+      }
+    ],
+    "escala_severidad": {
+      "Crítica": "Compromete seguridad, integridad de datos o una operación central del negocio sin alternativa.",
+      "Alta": "Afecta de forma importante una funcionalidad o los datos del negocio; existe alguna mitigación parcial.",
+      "Media": "Impacto funcional moderado; afecta la experiencia o la integración sin comprometer el negocio.",
+      "Baja": "Defecto menor o cosmético."
+    },
+    "escala_prioridad": {
+      "P1": "Se atiende de inmediato (hotfix o ciclo actual, bloquea el despliegue).",
+      "P2": "Se trabaja en el ciclo actual o en el siguiente release, no bloquea.",
+      "P3": "Se programa para el próximo sprint.",
+      "P4": "Backlog, se atiende según disponibilidad."
+    },
+    "criterios": [
+      "Severidad = gravedad del daño (seguridad, integridad de datos, operación del negocio). Prioridad = qué tan pronto actuar (urgencia, riesgo de release, existencia de workaround, esfuerzo y dependencias).",
+      "Matriz impacto × urgencia (1–5): importante y urgente → P1; importante no urgente → P2; urgente no importante → P3; resto → P4.",
+      "Reproducibilidad y alcance: un defecto 100 % reproducible que afecta a todos los usuarios de un endpoint sube en urgencia.",
+      "Si existe un workaround operativo, la urgencia puede bajar, pero la severidad no cambia.",
+      "Ningún defecto se cierra sin criterio de cierre verificable: prueba de regresión automatizada con el código del defecto en verde dentro del pipeline + smoke de rendimiento en verde.",
+      "Análisis sin culpa (blameless, Google SRE): se buscan fallas de proceso y de sistema, no responsables individuales."
+    ],
+    "hallazgos_de_la_sesion": [
+      "Tres pruebas existentes de tests/spec.js afirman el comportamiento defectuoso (aceptar el Basic hardcodeado en PUT y DELETE, y responder 405 al borrar un id inexistente). La suite 'pasaba en verde' precisamente porque protegía los defectos. Se decide reescribirlas junto con la corrección.",
+      "POST /booking responde 500 (error de servidor) cuando la validación falla, en lugar de 400. Se registra como observación para backlog (P4), sin código propio en este ciclo, porque cambiarlo rompe el contrato con clientes existentes y requiere acordarlo."
+    ]
+  },
+  "defectos": [
+    {
+      "id": "D-001",
+      "origen": "DEF-04 / Riesgo R3 (Actividad 2)",
+      "titulo": "Escritura sin autenticación real mediante header Basic hardcodeado",
+      "modulo": "routes/index.js — PUT, PATCH y DELETE /booking/:id",
+      "descripcion": "PUT, PATCH y DELETE /booking/:id aceptan el header 'Authorization: Basic YWRtaW46cGFzc3dvcmQxMjM=' (admin:password123 en Base64), publicado en la documentación de la propia API, sin pasar por POST /auth.",
+      "impacto": "Cualquier persona puede modificar o eliminar reservas ajenas: pérdida de integridad de datos, riesgo de seguridad y legal (datos personales de huéspedes).",
+      "evidencia": [
+        {
+          "tipo": "curl",
+          "ref": "triage/evidencia/T03_auth_hardcoded.txt",
+          "resumen": "PUT /booking/1 solo con el header Basic → 200 OK y la reserva se modifica"
+        },
+        {
+          "tipo": "curl",
+          "ref": "triage/evidencia/T-DELETE-01_auth_hardcoded.txt",
+          "resumen": "DELETE /booking/{id} solo con el header Basic → 201 y la reserva se elimina"
+        },
+        {
+          "tipo": "código",
+          "ref": "app/routes/index.js:434, :560, :615",
+          "resumen": "Condición `globalLogins[token] || req.headers.authorization == 'Basic YWRt…'` repetida en los tres handlers"
+        },
+        {
+          "tipo": "prueba",
+          "ref": "app/tests/spec.js:418-430 y :530-541",
+          "resumen": "Pruebas heredadas que esperan 200/201 usando el header Basic"
+        }
+      ],
+      "pasos": [
+        "Levantar la API (docker compose up)",
+        "Sin llamar a /auth, enviar PUT /booking/1 con 'Authorization: Basic YWRtaW46cGFzc3dvcmQxMjM='",
+        "Observar 200 OK y la reserva modificada"
+      ],
+      "esperado": "403 Forbidden: solo se permite escribir con un token emitido por POST /auth.",
+      "obtenido": "200 OK (PUT/PATCH) y 201 (DELETE): la operación se ejecuta.",
+      "reproducibilidad": "100 % (determinista)",
+      "alcance": "Todas las reservas y todos los clientes de la API",
+      "severidad_propuesta": "Crítica",
+      "prioridad_inicial": "P1",
+      "triage": {
+        "severidad": "Crítica",
+        "prioridad": "P1",
+        "impacto": 5,
+        "urgencia": 5,
+        "responsable": "Camilo Rivera Quintero (backend)",
+        "decision": "Hotfix",
+        "fecha_compromiso": "2026-10-31",
+        "workaround": "Ninguno técnico. Mitigación temporal: no exponer la API públicamente hasta desplegar el hotfix.",
+        "justificacion": "Vulnerabilidad de seguridad explotable con información pública y sin workaround. Importante y urgente: se hace primero.",
+        "criterio_cierre": "La prueba de regresión 'D-001' pasa (PUT/PATCH/DELETE con el header Basic → 403; con token válido → 200/201) y el escaneo de secretos (gitleaks) no reporta credenciales en el código."
+      },
+      "status": "open",
+      "fecha_cierre": null,
+      "regression_test": "D-001",
+      "cinco_porques": [
+        {
+          "pregunta": "¿Por qué se puede modificar una reserva sin autenticarse?",
+          "respuesta": "Porque los handlers PUT/PATCH/DELETE aceptan como válido un header Basic con credenciales fijas, además del token de sesión."
+        },
+        {
+          "pregunta": "¿Por qué los handlers aceptan un header con credenciales fijas?",
+          "respuesta": "Porque la condición de autorización compara el header contra un literal hardcodeado en el código (routes/index.js:434, :560, :615)."
+        },
+        {
+          "pregunta": "¿Por qué hay un literal de credenciales en el código?",
+          "respuesta": "Porque se añadió como atajo de autenticación para pruebas/demos y nunca se separó la configuración del código; tampoco existe un módulo de autorización central, así que la lógica se copió en tres handlers."
+        },
+        {
+          "pregunta": "¿Por qué el atajo llegó al código que se despliega sin que nadie lo detectara?",
+          "respuesta": "Porque las pruebas existentes (tests/spec.js:418, :530) validan que el Basic funcione, por lo que el pipeline lo trata como comportamiento correcto, y no existe un escaneo de secretos ni una revisión de seguridad en CI."
+        },
+        {
+          "pregunta": "¿Por qué no existe un control de seguridad en el pipeline?",
+          "respuesta": "Porque la definición de 'hecho' y los quality gates del proyecto solo exigían que las pruebas unitarias pasaran; no hay requisitos de seguridad explícitos ni gates que los verifiquen."
+        }
+      ],
+      "causa_raiz": "Ausencia de requisitos y controles de seguridad en el proceso (definición de hecho y pipeline sin escaneo de secretos), sumada a una autorización duplicada y hardcodeada en cada handler.",
+      "ishikawa": {
+        "Código": [
+          {
+            "causa": "Literal de credenciales Base64 comparado en tres handlers",
+            "tipo": "verificada",
+            "evidencia": "app/routes/index.js:434, :560, :615"
+          },
+          {
+            "causa": "Sin middleware de autorización central: la lógica está duplicada",
+            "tipo": "verificada",
+            "evidencia": "app/routes/index.js (misma condición en PUT/PATCH/DELETE)"
+          }
+        ],
+        "Procesos": [
+          {
+            "causa": "La definición de hecho no incluye criterios de seguridad",
+            "tipo": "suposición",
+            "evidencia": "Por validar con el historial de PRs del proyecto original"
+          },
+          {
+            "causa": "No hay revisión de seguridad en los PRs",
+            "tipo": "suposición",
+            "evidencia": "Por validar: no hay plantilla de PR ni CODEOWNERS en el repo"
+          }
+        ],
+        "Herramientas": [
+          {
+            "causa": "El pipeline no incluye escaneo de secretos ni SAST",
+            "tipo": "verificada",
+            "evidencia": "restful-booker/.github/workflows/test.yml solo ejecuta npm test"
+          }
+        ],
+        "Datos": [
+          {
+            "causa": "Las pruebas usan el header Basic como dato válido, lo que normaliza el atajo",
+            "tipo": "verificada",
+            "evidencia": "app/tests/spec.js:426, :538"
+          }
+        ],
+        "Diseño": [
+          {
+            "causa": "Dos mecanismos de autenticación paralelos (token + Basic) sin decisión documentada",
+            "tipo": "verificada",
+            "evidencia": "apidoc en routes/index.js documenta ambos ('Basic auth')"
+          }
+        ],
+        "Personas": [
+          {
+            "causa": "Baja sensibilización sobre el manejo de credenciales en código abierto",
+            "tipo": "suposición",
+            "evidencia": "Por validar con una encuesta breve al equipo"
+          }
+        ]
+      },
+      "acciones": [
+        {
+          "id": "A-01",
+          "tipo": "Corrección",
+          "accion": "Eliminar la aceptación del header Basic hardcodeado; autorizar solo con el token de /auth en un middleware único `requireAuth`",
+          "responsable": "Camilo Rivera",
+          "impacto": "Alto",
+          "esfuerzo": "Bajo",
+          "plazo": "2026-10-31",
+          "kpi": "Escrituras aceptadas sin token válido",
+          "umbral": "0 (prueba D-001 en verde)",
+          "gate": "G3"
+        },
+        {
+          "id": "A-02",
+          "tipo": "Prevención (herramienta)",
+          "accion": "Agregar escaneo de secretos con gitleaks como gate bloqueante del pipeline",
+          "responsable": "Camilo Rivera",
+          "impacto": "Alto",
+          "esfuerzo": "Bajo",
+          "plazo": "2026-10-31",
+          "kpi": "Secretos detectados en el código",
+          "umbral": "0 hallazgos",
+          "gate": "G2"
+        },
+        {
+          "id": "A-03",
+          "tipo": "Prevención (proceso)",
+          "accion": "Añadir el checklist de seguridad (credenciales, autorización) a la definición de hecho y a la plantilla de PR",
+          "responsable": "Karen Torres",
+          "impacto": "Medio",
+          "esfuerzo": "Bajo",
+          "plazo": "2026-11-07",
+          "kpi": "% de PRs con checklist de seguridad completo",
+          "umbral": "100 %",
+          "gate": null
+        }
+      ]
+    },
+    {
+      "id": "D-002",
+      "origen": "Riesgo R1 / caso T01 (Actividad 2)",
+      "titulo": "Se aceptan reservas con checkout anterior al checkin",
+      "modulo": "helpers/validationrules.js, helpers/validator.js — POST y PUT /booking",
+      "descripcion": "POST /booking crea reservas con fechas invertidas (checkout < checkin) o idénticas; la validación solo comprueba que los campos existan.",
+      "impacto": "Datos de negocio inválidos: noches negativas, facturación y ocupación incorrectas, y reportes corruptos.",
+      "evidencia": [
+        {
+          "tipo": "curl",
+          "ref": "triage/evidencia/T01_checkout_antes_checkin.txt",
+          "resumen": "checkin 2026-09-10, checkout 2026-09-01 → 200 OK, bookingid 11"
+        },
+        {
+          "tipo": "código",
+          "ref": "app/helpers/validationrules.js:7-8",
+          "resumen": "bookingdates.checkin/checkout solo con `presence: true`"
+        }
+      ],
+      "pasos": [
+        "POST /booking con bookingdates.checkin = 2026-09-10 y checkout = 2026-09-01",
+        "Observar 200 OK y la reserva creada"
+      ],
+      "esperado": "Rechazo (4xx) con el mensaje 'checkout debe ser posterior a checkin'.",
+      "obtenido": "200 OK y la reserva se persiste.",
+      "reproducibilidad": "100 %",
+      "alcance": "Todos los clientes que crean o actualizan reservas",
+      "severidad_propuesta": "Alta",
+      "prioridad_inicial": "P2",
+      "triage": {
+        "severidad": "Alta",
+        "prioridad": "P1",
+        "impacto": 4,
+        "urgencia": 4,
+        "responsable": "Karen Torres (validaciones)",
+        "decision": "Corrección en el ciclo actual",
+        "fecha_compromiso": "2026-11-03",
+        "workaround": "Consulta diaria de reservas con fechas invertidas y corrección manual (paliativo, no corrige la causa).",
+        "justificacion": "Se propuso P2, pero el comité la sube a P1: corrompe datos de negocio en cada uso, es 100 % reproducible y su corrección es de esfuerzo bajo.",
+        "criterio_cierre": "La prueba de regresión 'D-002' pasa (fechas invertidas o iguales → rechazo; fechas válidas → 200) y el smoke k6 sigue en verde."
+      },
+      "status": "open",
+      "fecha_cierre": null,
+      "regression_test": "D-002",
+      "cinco_porques": [
+        {
+          "pregunta": "¿Por qué se guardó una reserva con checkout antes del checkin?",
+          "respuesta": "Porque el validador aceptó el payload como válido."
+        },
+        {
+          "pregunta": "¿Por qué el validador lo aceptó?",
+          "respuesta": "Porque las reglas de validate.js solo exigen presencia de los campos de fecha (validationrules.js:7-8), no su orden ni su formato."
+        },
+        {
+          "pregunta": "¿Por qué las reglas no cubren el orden de las fechas?",
+          "respuesta": "Porque las reglas de negocio de una reserva (checkout > checkin) no están especificadas como criterio de aceptación de la API; solo existe el contrato de campos."
+        },
+        {
+          "pregunta": "¿Por qué no se detectó en pruebas?",
+          "respuesta": "Porque la suite solo prueba casos válidos con fechas correctas; no aplica partición de equivalencia ni valores límite sobre fechas."
+        },
+        {
+          "pregunta": "¿Por qué no hay pruebas de valores límite?",
+          "respuesta": "Porque el proceso de diseño de pruebas no exige técnicas de caja negra para reglas de negocio ni pide cobertura de casos negativos como criterio de salida."
+        }
+      ],
+      "causa_raiz": "Reglas de negocio de fechas no especificadas ni probadas: validación limitada a presencia de campos y ausencia de casos negativos/límite en el diseño de pruebas.",
+      "ishikawa": {
+        "Código": [
+          {
+            "causa": "Reglas de validación solo de presencia",
+            "tipo": "verificada",
+            "evidencia": "app/helpers/validationrules.js:7-8"
+          }
+        ],
+        "Diseño": [
+          {
+            "causa": "El contrato de la API no define la regla checkout > checkin",
+            "tipo": "verificada",
+            "evidencia": "apidoc POST /booking (routes/index.js) sin restricciones de fecha"
+          }
+        ],
+        "Procesos": [
+          {
+            "causa": "Criterios de aceptación sin reglas de negocio de fechas",
+            "tipo": "suposición",
+            "evidencia": "Por validar con el backlog/historias del proyecto"
+          },
+          {
+            "causa": "El diseño de pruebas no exige valores límite ni partición de equivalencia",
+            "tipo": "verificada",
+            "evidencia": "app/tests/spec.js: ningún caso con fechas inválidas"
+          }
+        ],
+        "Datos": [
+          {
+            "causa": "Los datos de prueba siempre usan fechas válidas",
+            "tipo": "verificada",
+            "evidencia": "app/tests/spec.js:28-30 (payloads con checkin < checkout)"
+          }
+        ],
+        "Herramientas": [
+          {
+            "causa": "Sin pruebas de contrato o esquema (p. ej. JSON Schema) en CI",
+            "tipo": "verificada",
+            "evidencia": "restful-booker/.github/workflows/test.yml"
+          }
+        ]
+      },
+      "acciones": [
+        {
+          "id": "A-04",
+          "tipo": "Corrección",
+          "accion": "Validar que checkin y checkout sean fechas válidas y que checkout > checkin en validator.js (aplica a POST y PUT)",
+          "responsable": "Karen Torres",
+          "impacto": "Alto",
+          "esfuerzo": "Bajo",
+          "plazo": "2026-11-03",
+          "kpi": "Reservas con fechas inválidas aceptadas",
+          "umbral": "0 (prueba D-002 en verde)",
+          "gate": "G3"
+        },
+        {
+          "id": "A-05",
+          "tipo": "Pruebas adicionales",
+          "accion": "Agregar casos negativos y de valores límite (fechas iguales, invertidas, inválidas) a la suite de regresión",
+          "responsable": "Karen Torres",
+          "impacto": "Alto",
+          "esfuerzo": "Bajo",
+          "plazo": "2026-11-03",
+          "kpi": "Cobertura de líneas de helpers/ y routes/",
+          "umbral": "≥ 80 %",
+          "gate": "G4"
+        }
+      ]
+    },
+    {
+      "id": "D-003",
+      "origen": "DEF-03 / Riesgo R4 (Actividad 2)",
+      "titulo": "totalprice negativo aceptado y no numérico convertido en null sin aviso",
+      "modulo": "helpers/validationrules.js, helpers/parser.js — POST y PUT /booking",
+      "descripcion": "totalprice = -50 se guarda tal cual; totalprice = \"abc\" se acepta y parser.js lo convierte con parseInt en NaN, que se serializa como null.",
+      "impacto": "Cobros incorrectos y corrupción silenciosa de datos financieros: la API responde 200 y el cliente cree que la reserva se guardó con su precio.",
+      "evidencia": [
+        {
+          "tipo": "curl",
+          "ref": "triage/evidencia/T04_totalprice_negative.txt",
+          "resumen": "totalprice -50 → 200 OK, precio negativo persistido"
+        },
+        {
+          "tipo": "curl",
+          "ref": "triage/evidencia/T04_totalprice_string.txt",
+          "resumen": "totalprice \"abc\" → 200 OK con \"totalprice\": null"
+        },
+        {
+          "tipo": "código",
+          "ref": "app/helpers/parser.js:24, :58",
+          "resumen": "'totalprice': parseInt(rawBooking.totalprice) sin comprobar NaN"
+        },
+        {
+          "tipo": "código",
+          "ref": "app/helpers/validationrules.js:5",
+          "resumen": "totalprice: {presence: true} sin numericality"
+        }
+      ],
+      "pasos": [
+        "POST /booking con totalprice = \"abc\"",
+        "Observar 200 OK y totalprice: null en la respuesta"
+      ],
+      "esperado": "Rechazo (4xx): totalprice debe ser numérico y ≥ 0.",
+      "obtenido": "200 OK; -50 se guarda y \"abc\" se convierte en null.",
+      "reproducibilidad": "100 %",
+      "alcance": "Todas las reservas creadas o actualizadas con payload malformado",
+      "severidad_propuesta": "Media",
+      "prioridad_inicial": "P2",
+      "triage": {
+        "severidad": "Alta",
+        "prioridad": "P1",
+        "impacto": 4,
+        "urgencia": 4,
+        "responsable": "Karen Torres (validaciones)",
+        "decision": "Corrección en el ciclo actual",
+        "fecha_compromiso": "2026-11-03",
+        "workaround": "Ninguno confiable: el valor original se pierde al convertirse en null.",
+        "justificacion": "Se reclasifica de Media a Alta: no es solo falta de validación, hay pérdida silenciosa de datos financieros (pérdida económica explícita). Sin workaround → P1.",
+        "criterio_cierre": "La prueba de regresión 'D-003' pasa (negativo y no numérico → rechazo; 0 y valores positivos → 200)."
+      },
+      "status": "open",
+      "fecha_cierre": null,
+      "regression_test": "D-003",
+      "cinco_porques": [
+        {
+          "pregunta": "¿Por qué una reserva quedó con totalprice null?",
+          "respuesta": "Porque parser.js aplica parseInt a 'abc', que devuelve NaN, y JSON serializa NaN como null."
+        },
+        {
+          "pregunta": "¿Por qué llegó un valor no numérico al parser?",
+          "respuesta": "Porque la regla de validación de totalprice solo exige presencia (validationrules.js:5), no tipo ni rango."
+        },
+        {
+          "pregunta": "¿Por qué el parser no detecta el NaN?",
+          "respuesta": "Porque está diseñado para transformar la salida y no valida; asume que el dato ya viene limpio (responsabilidad repartida sin contrato)."
+        },
+        {
+          "pregunta": "¿Por qué no hay contrato de tipos entre la entrada y la persistencia?",
+          "respuesta": "Porque la API acepta JSON, XML y form-urlencoded (donde todo es texto) y no hay un esquema común que normalice y valide tipos antes de guardar."
+        },
+        {
+          "pregunta": "¿Por qué no se definió ese esquema?",
+          "respuesta": "Porque no hay estándar de diseño de la API (tipos, rangos, códigos de error) ni un paso de revisión de contrato en el proceso de desarrollo."
+        }
+      ],
+      "causa_raiz": "Falta de un contrato de datos (tipos y rangos) validado en la entrada; el parser convierte en silencio en lugar de fallar.",
+      "ishikawa": {
+        "Código": [
+          {
+            "causa": "parseInt sin comprobar NaN",
+            "tipo": "verificada",
+            "evidencia": "app/helpers/parser.js:24, :58"
+          },
+          {
+            "causa": "Regla totalprice sin numericality ni mínimo",
+            "tipo": "verificada",
+            "evidencia": "app/helpers/validationrules.js:5"
+          }
+        ],
+        "Diseño": [
+          {
+            "causa": "Tres formatos de entrada (JSON/XML/urlencoded) sin esquema común de tipos",
+            "tipo": "verificada",
+            "evidencia": "app/app.js (parsers json, xml, urlencoded)"
+          }
+        ],
+        "Datos": [
+          {
+            "causa": "No hay datos de prueba de tipo incorrecto ni negativos",
+            "tipo": "verificada",
+            "evidencia": "app/tests/spec.js: totalprice siempre 111"
+          }
+        ],
+        "Procesos": [
+          {
+            "causa": "No existe un estándar de API (tipos, rangos, códigos de error)",
+            "tipo": "suposición",
+            "evidencia": "Por validar: no hay guía de estilo de API en el repo"
+          }
+        ],
+        "Herramientas": [
+          {
+            "causa": "No hay análisis estático que marque conversiones inseguras",
+            "tipo": "suposición",
+            "evidencia": "Por validar con una regla de SonarQube/ESLint"
+          }
+        ]
+      },
+      "acciones": [
+        {
+          "id": "A-06",
+          "tipo": "Corrección",
+          "accion": "Regla numericality (≥ 0) para totalprice y rechazo de valores no numéricos antes de persistir",
+          "responsable": "Karen Torres",
+          "impacto": "Alto",
+          "esfuerzo": "Bajo",
+          "plazo": "2026-11-03",
+          "kpi": "Reservas con totalprice null o negativo",
+          "umbral": "0 (prueba D-003 en verde)",
+          "gate": "G3"
+        },
+        {
+          "id": "A-07",
+          "tipo": "Refactor",
+          "accion": "Definir un esquema JSON único de reserva (tipos, rangos) y validarlo para los tres formatos de entrada",
+          "responsable": "Camilo Rivera",
+          "impacto": "Alto",
+          "esfuerzo": "Medio",
+          "plazo": "2026-11-14",
+          "kpi": "Endpoints de escritura validados contra el esquema",
+          "umbral": "100 %",
+          "gate": null
+        }
+      ]
+    },
+    {
+      "id": "D-004",
+      "origen": "DEF-01 / Riesgo R2 (Actividad 2)",
+      "titulo": "Se aceptan reservas solapadas (doble reserva)",
+      "modulo": "routes/index.js POST /booking, models/booking.js",
+      "descripcion": "Dos reservas para el mismo rango de fechas se crean sin conflicto. La API no tiene el concepto de habitación, por lo que no se puede decidir qué es un solapamiento.",
+      "impacto": "En un negocio real de reservas: doble venta de la misma habitación, sobrecupo, compensaciones económicas y pérdida de confianza.",
+      "evidencia": [
+        {
+          "tipo": "prueba automatizada",
+          "ref": "restful-booker/master-plan/automation (escenario Cucumber 'DEF-01') y master-plan/evidencias/cucumber_smoke_result.xml",
+          "resumen": "Dos POST con el mismo rango → dos bookingid distintos"
+        },
+        {
+          "tipo": "código",
+          "ref": "app/models/booking.js:24-33",
+          "resumen": "create() inserta sin consultar reservas existentes"
+        }
+      ],
+      "pasos": [
+        "POST /booking con checkin 2026-12-01 / checkout 2026-12-05",
+        "Repetir el mismo POST",
+        "Observar dos reservas creadas"
+      ],
+      "esperado": "Rechazo (409 Conflict) si el recurso ya está reservado en ese rango.",
+      "obtenido": "200 OK en ambas solicitudes.",
+      "reproducibilidad": "100 %",
+      "alcance": "Todas las reservas; el impacto real depende del modelo de habitaciones",
+      "severidad_propuesta": "Crítica",
+      "prioridad_inicial": "P1",
+      "triage": {
+        "severidad": "Crítica",
+        "prioridad": "P2",
+        "impacto": 5,
+        "urgencia": 2,
+        "responsable": "Camilo Rivera Quintero (diseño) + Product Owner",
+        "decision": "Investigación y aclaración del requisito; corrección en el siguiente release",
+        "fecha_compromiso": "2026-11-14",
+        "workaround": "Conciliación diaria de reservas con fechas superpuestas (consulta GET /booking?checkin=&checkout=) y contacto manual al cliente.",
+        "justificacion": "La severidad sigue siendo Crítica, pero la prioridad baja a P2: corregirlo exige un cambio de modelo (entidad habitación/recurso) y una decisión de negocio. Un hotfix que rechace cualquier solapamiento global bloquearía reservas legítimas. Hay workaround operativo. Es el caso donde severidad y prioridad se separan.",
+        "criterio_cierre": "Requisito aprobado por el PO; prueba de regresión 'D-004' (misma habitación + rango solapado → 409; habitaciones distintas → 200) en verde."
+      },
+      "status": "open",
+      "fecha_cierre": null,
+      "regression_test": "D-004",
+      "cinco_porques": [
+        {
+          "pregunta": "¿Por qué se aceptan dos reservas para las mismas fechas?",
+          "respuesta": "Porque create() inserta la reserva sin consultar si existe otra en el mismo rango."
+        },
+        {
+          "pregunta": "¿Por qué no se consulta?",
+          "respuesta": "Porque el modelo de datos no tiene un recurso reservable (habitación), así que no hay contra qué comparar el solapamiento."
+        },
+        {
+          "pregunta": "¿Por qué el modelo no tiene habitaciones?",
+          "respuesta": "Porque la API se diseñó como un sandbox de pruebas centrado en el CRUD de reservas, no en las reglas de disponibilidad del dominio."
+        },
+        {
+          "pregunta": "¿Por qué no se identificó la brecha de dominio antes?",
+          "respuesta": "Porque no se hizo un análisis de requisitos del dominio de reservas; los requisitos se derivaron del contrato existente de la API."
+        },
+        {
+          "pregunta": "¿Por qué los requisitos se derivaron del contrato?",
+          "respuesta": "Porque no hay un Product Owner ni un proceso de refinamiento que valide las reglas de negocio críticas (disponibilidad) antes de construir."
+        }
+      ],
+      "causa_raiz": "Brecha de diseño del dominio: el modelo no representa el recurso reservable y no hubo análisis de requisitos de disponibilidad.",
+      "ishikawa": {
+        "Diseño": [
+          {
+            "causa": "No existe entidad habitación/recurso en el modelo",
+            "tipo": "verificada",
+            "evidencia": "app/models/booking.js (colección única 'bookings')"
+          }
+        ],
+        "Código": [
+          {
+            "causa": "create() no verifica conflictos",
+            "tipo": "verificada",
+            "evidencia": "app/models/booking.js:24-33"
+          }
+        ],
+        "Procesos": [
+          {
+            "causa": "Sin análisis de requisitos del dominio ni Product Owner",
+            "tipo": "suposición",
+            "evidencia": "Por validar con el autor original / backlog"
+          }
+        ],
+        "Entornos": [
+          {
+            "causa": "LokiJS en memoria sin transacciones: una verificación ingenua tendría condiciones de carrera bajo concurrencia",
+            "tipo": "suposición",
+            "evidencia": "Por validar con la prueba de carga concurrente (k6, A3)"
+          }
+        ],
+        "Herramientas": [
+          {
+            "causa": "La prueba de caracterización DEF-01 se dejó en verde 'por diseño', ocultando el defecto en el pipeline",
+            "tipo": "verificada",
+            "evidencia": "restful-booker/master-plan/docs/MASTER_PLAN.md §9"
+          }
+        ]
+      },
+      "acciones": [
+        {
+          "id": "A-08",
+          "tipo": "Investigación",
+          "accion": "Taller con el PO para definir el recurso reservable y la regla de disponibilidad; documentar la decisión (ADR)",
+          "responsable": "Camilo Rivera",
+          "impacto": "Alto",
+          "esfuerzo": "Bajo",
+          "plazo": "2026-11-07",
+          "kpi": "Requisito de disponibilidad aprobado",
+          "umbral": "ADR aprobado",
+          "gate": null
+        },
+        {
+          "id": "A-09",
+          "tipo": "Refactor/infra",
+          "accion": "Agregar entidad habitación y verificación de solapamiento con índice por (habitación, fechas); responder 409",
+          "responsable": "Camilo Rivera",
+          "impacto": "Alto",
+          "esfuerzo": "Alto",
+          "plazo": "2026-11-14",
+          "kpi": "Reservas solapadas para la misma habitación",
+          "umbral": "0 (prueba D-004 en verde)",
+          "gate": "G3"
+        },
+        {
+          "id": "A-10",
+          "tipo": "Workaround",
+          "accion": "Consulta diaria de reservas solapadas y conciliación manual mientras se corrige",
+          "responsable": "Karen Torres",
+          "impacto": "Medio",
+          "esfuerzo": "Bajo",
+          "plazo": "2026-10-31",
+          "kpi": "Solapamientos detectados y conciliados en < 24 h",
+          "umbral": "100 %",
+          "gate": null
+        }
+      ]
+    },
+    {
+      "id": "D-005",
+      "origen": "DEF-02 / Riesgo R5 (Actividad 2)",
+      "titulo": "DELETE sobre una reserva inexistente responde 405 en lugar de 404",
+      "modulo": "routes/index.js — DELETE /booking/:id",
+      "descripcion": "Eliminar un id que no existe devuelve 405 Method Not Allowed, que significa 'método no soportado', en vez de 404 Not Found.",
+      "impacto": "Los clientes y la automatización interpretan mal el resultado (reintentos inútiles, alertas falsas); el contrato REST es inconsistente.",
+      "evidencia": [
+        {
+          "tipo": "curl",
+          "ref": "triage/evidencia/T05_delete_nonexistent.txt",
+          "resumen": "DELETE /booking/999999 → 405 Method Not Allowed"
+        },
+        {
+          "tipo": "código",
+          "ref": "app/routes/index.js:622",
+          "resumen": "res.sendStatus(405) cuando no hay registro"
+        },
+        {
+          "tipo": "prueba",
+          "ref": "app/tests/spec.js:543-552",
+          "resumen": "Prueba heredada que espera 405"
+        }
+      ],
+      "pasos": [
+        "Obtener un token en POST /auth",
+        "DELETE /booking/10000000 con el token",
+        "Observar 405"
+      ],
+      "esperado": "404 Not Found.",
+      "obtenido": "405 Method Not Allowed.",
+      "reproducibilidad": "100 %",
+      "alcance": "Clientes de integración que borran reservas",
+      "severidad_propuesta": "Media",
+      "prioridad_inicial": "P3",
+      "triage": {
+        "severidad": "Media",
+        "prioridad": "P3",
+        "impacto": 2,
+        "urgencia": 2,
+        "responsable": "Karen Torres",
+        "decision": "Quick win: se corrige junto con D-001 porque toca el mismo handler",
+        "fecha_compromiso": "2026-11-10",
+        "workaround": "Los clientes pueden tratar el 405 de DELETE como 'no existe'.",
+        "justificacion": "Impacto bajo y no urgente (P3), pero de esfuerzo muy bajo y en el mismo handler que el hotfix D-001: se adelanta como quick win (impacto bajo / esfuerzo bajo).",
+        "criterio_cierre": "La prueba de regresión 'D-005' pasa (DELETE de un id inexistente → 404)."
+      },
+      "status": "open",
+      "fecha_cierre": null,
+      "regression_test": "D-005",
+      "cinco_porques": [
+        {
+          "pregunta": "¿Por qué DELETE de un id inexistente devuelve 405?",
+          "respuesta": "Porque el handler responde 405 cuando Booking.get no encuentra el registro (routes/index.js:622)."
+        },
+        {
+          "pregunta": "¿Por qué se eligió 405?",
+          "respuesta": "Porque se reutilizó el mismo código que en PUT/PATCH para 'registro no encontrado', sin consultar la semántica HTTP."
+        },
+        {
+          "pregunta": "¿Por qué no se corrigió al revisarlo?",
+          "respuesta": "Porque la prueba heredada (spec.js:543) fija el 405 como resultado esperado, así que cualquier cambio rompía el build."
+        },
+        {
+          "pregunta": "¿Por qué la prueba fija un código incorrecto?",
+          "respuesta": "Porque las pruebas se escribieron describiendo el comportamiento actual (caracterización), no a partir de una especificación de códigos de estado."
+        },
+        {
+          "pregunta": "¿Por qué no hay especificación de códigos de estado?",
+          "respuesta": "Porque la API no tiene un estándar de diseño de errores; es la misma causa de proceso que en D-003."
+        }
+      ],
+      "causa_raiz": "Ausencia de un estándar de códigos de estado HTTP; las pruebas de caracterización consolidaron el comportamiento incorrecto.",
+      "ishikawa": {
+        "Código": [
+          {
+            "causa": "sendStatus(405) para 'no encontrado'",
+            "tipo": "verificada",
+            "evidencia": "app/routes/index.js:622"
+          }
+        ],
+        "Datos": [
+          {
+            "causa": "La prueba espera 405, lo que perpetúa el error",
+            "tipo": "verificada",
+            "evidencia": "app/tests/spec.js:551"
+          }
+        ],
+        "Procesos": [
+          {
+            "causa": "Sin estándar de diseño de errores HTTP",
+            "tipo": "suposición",
+            "evidencia": "Por validar: no hay guía de API en el repo"
+          }
+        ],
+        "Personas": [
+          {
+            "causa": "Confusión entre 405 (método) y 404 (recurso)",
+            "tipo": "suposición",
+            "evidencia": "Por validar en la retrospectiva"
+          }
+        ]
+      },
+      "acciones": [
+        {
+          "id": "A-11",
+          "tipo": "Corrección",
+          "accion": "DELETE de un id inexistente → 404 y actualizar la prueba heredada",
+          "responsable": "Karen Torres",
+          "impacto": "Bajo",
+          "esfuerzo": "Bajo",
+          "plazo": "2026-10-31",
+          "kpi": "Respuestas 405 en DELETE de recursos inexistentes",
+          "umbral": "0 (prueba D-005 en verde)",
+          "gate": "G3"
+        },
+        {
+          "id": "A-12",
+          "tipo": "Prevención (proceso)",
+          "accion": "Publicar una guía corta de códigos de estado (400/403/404/409) y revisarla en cada PR de la API",
+          "responsable": "Karen Torres",
+          "impacto": "Medio",
+          "esfuerzo": "Bajo",
+          "plazo": "2026-11-10",
+          "kpi": "Endpoints conformes a la guía",
+          "umbral": "100 %",
+          "gate": null
+        }
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "G1",
+      "etapa": "1. Estático (fail-fast)",
+      "nombre": "Gate de triage",
+      "mide": "Defectos P1 abiertos; defectos resueltos sin prueba de regresión existente",
+      "umbral": "0 P1 abiertos y 100 % de los resueltos con prueba 'D-00X'",
+      "justificacion": "Traduce la regla de clase 'no desplegar con defectos críticos abiertos' a una regla automática conectada con el acta (defects.json).",
+      "previene": [
+        "D-001",
+        "D-002",
+        "D-003",
+        "D-004",
+        "D-005"
+      ],
+      "herramienta": "triage/triage.py gate (Python stdlib)",
+      "si_falla": "El pipeline se detiene antes de compilar o probar."
+    },
+    {
+      "id": "G2",
+      "etapa": "1. Estático (fail-fast)",
+      "nombre": "Escaneo de secretos y dependencias",
+      "mide": "Credenciales en el código; vulnerabilidades altas/críticas en dependencias",
+      "umbral": "0 secretos; 0 vulnerabilidades high/critical (npm audit)",
+      "justificacion": "D-001 nació de una credencial en el código. Es barato (segundos) y por eso va primero.",
+      "previene": [
+        "D-001"
+      ],
+      "herramienta": "gitleaks + npm audit --audit-level=high",
+      "si_falla": "Bloquea el merge; el desarrollador debe retirar la credencial o actualizar la dependencia."
+    },
+    {
+      "id": "G3",
+      "etapa": "2. Pruebas",
+      "nombre": "Regresión de defectos + unitarias",
+      "mide": "Pruebas mocha (spec.js + regression.spec.js)",
+      "umbral": "100 % de éxito (0 fallos)",
+      "justificacion": "Cada defecto cerrado tiene una prueba que impide que reaparezca (criterio de cierre del acta).",
+      "previene": [
+        "D-001",
+        "D-002",
+        "D-003",
+        "D-005"
+      ],
+      "herramienta": "mocha + supertest",
+      "si_falla": "Bloquea; el reporte indica qué D-00X volvió a aparecer."
+    },
+    {
+      "id": "G4",
+      "etapa": "2. Pruebas",
+      "nombre": "Cobertura mínima",
+      "mide": "% de líneas cubiertas en helpers/, routes/ y models/",
+      "umbral": "≥ 80 % de líneas",
+      "justificacion": "Umbral visto en clase y por defecto en el quality gate 'Sonar way' para código nuevo; las causas raíz de D-002/D-003 fueron ramas sin probar.",
+      "previene": [
+        "D-002",
+        "D-003"
+      ],
+      "herramienta": "c8 (cobertura V8 nativa, sin instrumentar)",
+      "si_falla": "Bloquea hasta agregar las pruebas faltantes."
+    },
+    {
+      "id": "G5",
+      "etapa": "3. Rendimiento",
+      "nombre": "Smoke de rendimiento",
+      "mide": "Tasa de error, latencia P95 y checks funcionales bajo 10 VU durante 30 s",
+      "umbral": "http_req_failed < 1 %, p(95) < 300 ms, checks > 99 %",
+      "justificacion": "En la A3 se midió un P95 de 6–10 ms con un SLO de 800 ms. 300 ms es el umbral visto en clase y deja margen para detectar regresiones grandes (p. ej. validaciones costosas o la futura verificación de solapamiento de D-004) sin falsos positivos.",
+      "previene": [
+        "D-002",
+        "D-003",
+        "D-004"
+      ],
+      "herramienta": "k6 (thresholds → exit code ≠ 0)",
+      "si_falla": "Bloquea el despliegue; se adjunta el resumen k6 como artefacto."
+    },
+    {
+      "id": "G6",
+      "etapa": "4. Despliegue",
+      "nombre": "Despliegue condicionado",
+      "mide": "Que G1–G5 estén aprobados",
+      "umbral": "Todos en verde",
+      "justificacion": "Implementa el flujo de clase: pruebas → quality gates → ¿cumple? → despliegue / se detiene.",
+      "previene": [],
+      "herramienta": "GitHub Actions (needs:) + docker build",
+      "si_falla": "No se construye ni publica la imagen."
+    },
+    {
+      "id": "G7",
+      "etapa": "Recomendado (no implementado)",
+      "nombre": "Quality gate SonarQube/SonarCloud",
+      "mide": "Cobertura de código nuevo, duplicación, issues bloqueantes y hotspots de seguridad",
+      "umbral": "Cobertura nuevo código ≥ 80 %, duplicación < 3 %, 0 issues blocker/critical, rating de seguridad A",
+      "justificacion": "Es el estándar de la industria para gates estáticos y cubre la causa de D-001 (hotspot de credenciales) y D-003 (conversiones inseguras). No se implementa en el piloto porque requiere cuenta y token del servidor.",
+      "previene": [
+        "D-001",
+        "D-003"
+      ],
+      "herramienta": "SonarCloud + sonarsource/sonarqube-scan-action",
+      "si_falla": "El estado del quality gate en el PR queda 'Failed' y bloquea el merge (branch protection)."
+    }
+  ]
+}

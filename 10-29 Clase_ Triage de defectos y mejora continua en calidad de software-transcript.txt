@@ -1,0 +1,756 @@
+00:00:00 Speaker 1
+En un entorno de calidad, pues es un poco más teórico todo, no es un poco, pues aunque hay una fase técnica,
+00:00:06 Speaker 1
+También hay unas par que ya ustedes estuvieron trabajando en la parte técnica. Aquí ya se viene más análisis de resultados y mejora continua, es la unidad 3, entonces el análisis de resultados es donde uno se sienta, hace una sesión de triage, un plan de mejora y por acá en la actividad 6 vamos a ver auditoría cruzada, que eso no es más.
+00:00:30 Speaker 1
+Que coger y validar entre varias frentes las auditorías que han hecho los demás. Sí, ya después entramos ahí como a entender eso, pero por el momento vamos a hacer énfasis en sesión de triage más plan de mejora.
+00:00:48 Speaker 1
+Entonces aquí lo que plantea un poco la actividad al final es que ustedes.
+00:00:55 Speaker 1
+Como producto de la actividad, voy a leer esta parte como para no leer todo, pues ahí ustedes lo valían, pero como producto de la actividad es un acta de triage con 3 defectos, con una severidad, una prioridad, unos responsables y unas fechas. Es como que se metan un poco ahí en la película de que están haciendo un acta de triage y encuentren 3 defectos.
+00:01:19 Speaker 1
+Analizar la causa raíz por cada uno de los defectos. Aquí podemos utilizar la estrategia de los cinco porqués,
+00:01:28 Speaker 1
+Más la famosa Ichihuaca, que ahorita la vemos, Chicagua es la vaina de Chicagua, siempre me confundo con la evidencia pues que lo hayan hecho, entonces ahí pueden hacer la famosa espina de pescado.
+00:01:41 Speaker 1
+El plan de mejora, que no es más que una tabla de acciones priorizadas, responsables, esfuerzos, KPI, o sea, como algo definido, es por eso les digo, esto es un tema mucho más.
+00:01:52 Speaker 1
+De proceso más que técnico, es más de proceso, pero que sí o sí hay que hacerlo a nivel gerencial y al final, pues un documento de la propuesta técnica con los cuality gates, las reglas investigadas, detentar acumulares definidos, justificar herramientas seleccionadas para automatización de, pues sí, en este caso de un aquí se está es como esperando que ustedes validen qué herramientas existen para automatización de.
+00:02:21 Speaker 1
+De despliegues.
+00:02:23 Speaker 1
+Entonces, entonces, esto está para el primero de noviembre.
+00:02:28 Speaker 1
+Quiero verificar fechas porque ya estamos,
+00:02:32 Speaker 1
+Ya estamos a puerta.
+00:02:35 Speaker 1
+Y una vez hagan esta tarea en la actividad seis.
+00:02:41 Speaker 2
+Se ve por qué se bloqueó esto?
+00:02:47 Speaker 1
+Me estás escuchando? Sí.
+00:02:52 Speaker 3
+Sí señor, sí señor.
+00:02:54 Speaker 1
+Bueno, entonces fue mi internet a darle paso a esto.
+00:02:57 Speaker 2
+Se quedó acá pegado.
+00:02:59 Speaker 2
+Espérate, ya lo actualizo.
+00:03:01 Speaker 4
+Algo pasó,
+00:03:09 Speaker 2
+Qué raro.
+00:03:10 Speaker 2
+A ver.
+00:03:17 Speaker 2
+Ya actividad 6.
+00:03:26 Speaker 1
+Ah, OK, esta está poquito. Es que esta es fácil, esta actividad es fácil.
+00:03:31 Speaker 1
+Está del 26 al 8 sí, no, esto está mal porque aquí primero se cierra una y después se abre la otra y ya después presentan una evaluación, que esto sí es un quiz que lo presentan en cualquier momento y cerraríamos.
+00:03:42 Speaker 1
+Listo, entonces no vámonos AA hacer un énfasis en esta actividad de cómo hacer las cosas para que les quede más fácil al momento de de realizarlas.
+00:03:53 Speaker 1
+Listo, entonces ahora sí voy a compartirte por acá.
+00:03:59 Speaker 2
+Compartamos.
+00:04:01 Speaker 2
+Compartamos, compartamos, que se me hizo esto es observabilidad,
+00:04:08 Speaker 1
+Bueno eso también es también es algo de los que les quería mencionar hoy,
+00:04:11 Speaker 2
+Pero y solo te conectaste tú al final,
+00:04:15 Speaker 4
+A ver ¿Ey ya estás viendo?
+00:04:26 Speaker 4
+Que está como está cargando ahora sí ya.
+00:04:41 Speaker 3
+Listo. Profesor ese, ah bueno, ya.
+00:04:45 Speaker 2
+Ya, ya, ya.
+00:04:47 Speaker 1
+Es que no sé qué le está pasando, esto me está como, lo siento raro,
+00:04:51 Speaker 1
+Pero bueno, ahí me estás escuchando, que lo importante.
+00:04:54 Speaker 1
+Listo, ahí ya estás viendo.
+00:04:56 Speaker 1
+Entonces, vamos a arrancar un poco como la manera en que se va a abordar precisamente las tres cosas que les estoy pidiendo. Entonces, esto lo llamo como laboratorio de triage,
+00:05:08 Speaker 1
+Que son esos criterios para analizar defectos, clasificar, hallar causas raíces, proponer los famosos quality gates,
+00:05:16 Speaker 1
+Que es lo que quiero que hagan en el trabajo, o sea que con esta presentación de una u otra manera les estoy dando las pautas para que pues hagan su trabajo y quede como bien. Entonces lo primero es, bueno, aquí es importante que pues ustedes tengan presente dentro de lo que vamos a ver, Que es lo que se les estoy pidiendo en el trabajo, el triage, la causa raíz y todo el tema de prevención. Sí, es como las la manera en que lo vamos a revisar.
+00:05:49 Speaker 1
+Entonces, a nivel de triage,
+00:05:50 Speaker 1
+Diferenciar la severidad, la prioridad, acordar responsables, objetivos, lo que no se mide, lo que no se tiene establecido, Cristian, lo que no se tiene escrito dentro de un proceso de calidad de software. Créame que eso se lo lleva el viento y más cuando los procesos de calidad de software, pues están abarcados normalmente por las auditorías. Siempre la calidad va atado a una auditoría que es la que valida si se están haciendo bien o no las cosas. Entonces, el tema de tener los reportes,
+00:06:23 Speaker 1
+Los hallazgos, las fechas y una gestión importante,
+00:06:28 Speaker 1
+Una gestión del de lo que se está haciendo, es decir, es importante de cara a los procesos de calidad.
+00:06:36 Speaker 1
+También vamos a ver la causa raíz,
+00:06:40 Speaker 1
+Que en últimas se convierte cuando uno hay cuando hay problemas dentro de un software, porque esto lo estamos abarcando como dentro software de un programa de un software que se está trabajando en X o Y empresa.
+00:06:57 Speaker 1
+La calidad entra aquí a jugar un valor importante porque necesitamos encontrar realmente el por qué está fallando. A veces los pañitos de agua tibia en el software Christian se convierten en unos problemas a futuro mucho más grandes. Entonces a veces es mejor, a veces no, siempre va a ser mejor en contra de la causa raíz y hay unas estrategias para hacer eso.
+00:07:22 Speaker 1
+Y al final pues el tema de prevención, traducción de hallazgos, plan de mejora, que se convierten como en esos insumos importantes para.
+00:07:32 Speaker 1
+Tener un control de prevención, de validación de riesgos, etcétera.
+00:07:37 Speaker 2
+Listo.
+00:07:41 Speaker 1
+Cómo van a hacer su laboratorio?¿Cómo lo quiero que lo trabajen?
+00:07:45 Speaker 1
+Entonces, el laboratorio quiero que lo trabajen primero en una capa de entrada. Sí, en esta capa de entrada,
+00:07:55 Speaker 2
+Déjenme aquí yo voy rayando,
+00:07:58 Speaker 1
+Voy rayando, sí, entonces en esta capa de entrada.
+00:08:02 Speaker 1
+Es donde vamos a involucrar estos defectos reportados con la evidencia mínima,
+00:08:09 Speaker 1
+Los pasos, los logs,
+00:08:12 Speaker 1
+Los stacks, las capturas y la severidad propuesta, es decir, vamos a tener un inicio en donde vamos a empezar a involucrar las diferentes evidencias de lo que se encontró en un proceso de.
+00:08:27 Speaker 1
+Auditoría, en unas pruebas de software, etcétera. Recuerden que nosotros veníamos en una línea.
+00:08:35 Speaker 1
+Sí, nuestra línea de trabajo, nuestra línea de trabajo es.
+00:08:42 Speaker 1
+Era todo el tema de planificación,
+00:08:45 Speaker 1
+Cierto, de las pruebas,
+00:08:47 Speaker 1
+Pruebas de rendimiento y de carga, y aquí es análisis de los resultados.
+00:08:52 Speaker 1
+Entonces, claro, Ya de una u otra manera nosotros hemos trabajado como en la capa de entrada, donde ustedes han hecho pruebas,
+00:09:00 Speaker 1
+Han corrido por allá el grafana, con caseis, etcétera, etcétera.
+00:09:05 Speaker 1
+Y ya hay unas evidencias un poco de cosas que se han involucrado, pero como aquí nos vamos a meter en la película de que vamos a tener hallazgos,
+00:09:13 Speaker 1
+Porque precisamente es lo que se busca al momento aquí en la actividad número.
+00:09:23 Speaker 1
+5 es la que vamos a hacer.
+00:09:27 Speaker 1
+Acá está la actividad número 5. Entonces aquí, pues precisamente necesitamos encontrar defectos para que eso a su vez se les se les clasifique en una severidad, en una prioridad, cierto, entonces, pues hay como que meternos un poco en la película, que por este lado debemos encontrar fallas, listo, pues que pues es lo que normalmente pasa.
+00:09:50 Speaker 1
+Viene el famoso triage, el famoso triage no es más que una sesión donde se involucran los diferentes stakeholders. Entonces van a estar por un lado las personas de calidad, cierto, esto está enfocado pues en calidad de software. Entonces van a estar las personas de calidad, van a estar los del área del desarrollo, los dueños de la aplicación,
+00:10:15 Speaker 2
+Sí, los dueños de la app.
+00:10:19 Speaker 1
+O sea, aquí serían los ingenieros de desarrollo, los dueños. Bueno, hay varios dueños, no están los dueños del desarrollo.
+00:10:29 Speaker 1
+Cierto? Y están los funcionales o los líderes funcionales, los los últimos los que utilizan.
+00:10:38 Speaker 1
+Los funcionales. Entonces en este triage normalmente, normalmente, pues están involucrados las diferentes áreas, los que hicieron las pruebas, los que encontraron los hallazgos, los que van a corregirlos, los que son dueños de la aplicación de una u otra manera, los que la desarrollaron. los que la utilizan, que son los funcionales, son como las tres áreas, por darles nombre, sí, o los tres procesos que se involucran en esta dinámica.
+00:11:11 Speaker 1
+Entonces, ¿aquí qué pasa?¿Qué es esto? Básicamente son acuerdos, aquí es donde se reúnen, se acuerdan severidades,
+00:11:20 Speaker 1
+Prioridades, responsables, tiempos,
+00:11:26 Speaker 1
+Decisiones hay, si se va a hacer algún hotfix, si se va a crear un release nuevo, una nueva actualización, hay que hay que hacer o simplemente se ingresa a un backlog y allí se va a empezar a trabajar.
+00:11:42 Speaker 1
+Listo, entonces esto no es más, sí, a veces de pronto aquí en todo lo que ustedes van a leer, entonces aquí entonces claro, y aquí hay documentación y entonces que El famoso triage y entonces claro, cuando ustedes vayan a hacer el trabajo, pues como así que un triage, pues un triage no es nada más ni nada menos que una reunión donde hay un aquí ustedes, aquí Cristian, lo que yo les aconsejo es con base en lo que ahorita vamos a ver,
+00:12:11 Speaker 1
+Pues detectan los defectos,
+00:12:14 Speaker 2
+Hacen un puede ser un formato,
+00:12:17 Speaker 1
+Se inventan un formatico, lo hacen ahí en el mismo trabajo.
+00:12:21 Speaker 1
+Inviertan un formatico donde clasifican los defectos y después hacen como una especie de acta de reunión, se la pueden inventar o un acta de triage,
+00:12:30 Speaker 1
+La llaman así y ahí hacen una tablita donde ok, compase en lo que se encontró, se encontró tal defecto, tal impacto y se evidencia tal y tal. Listo, entonces eso es realmente el triage.
+00:12:43 Speaker 1
+Después hay un análisis, entonces con cada uno de esos defectos,
+00:12:49 Speaker 1
+Cierto que son mínimo tres.
+00:12:51 Speaker 1
+Si quieren hacer más porque quieren obviamente entender a grosso modo muchas cosas, pues bienvenido sea. Entonces aquí van a utilizar una estrategia de los cinco porqués listo para distinguir las causas validadas y los supuestos que están pues pendiente para tener una salida que al final es un plan de mejora. La suma de todo esto se convierte en un plan de mejora donde ese plan. ya se le va a poner acciones priorizadas que salieron de aquí,
+00:13:26 Speaker 1
+Cierto, salieron de por acá, esta prioridad, esta severidad, pero aquí en el plan de mejora ya se aterriza, se crea un KPI para verificar, entonces OK, vamos a tener reuniones semanales y el KPI es que no sé, el 20% debe estar en las primeras 2 semanas, no sé, se puede inventar muchos KPIs aquí lo que hay es precisamente.
+00:13:50 Speaker 1
+Mucha tela por cortar, el Quality Gates para empezar a encontrar puntos de calificación de cómo va nuestro proceso,
+00:14:01 Speaker 1
+Que reduzcan, que ayuden a validar la recurrencia de los defectos, que no pasen los defectos.
+00:14:11 Speaker 2
+Listo, entonces,
+00:14:13 Speaker 1
+Hasta ahí bien Cristian?
+00:14:14 Speaker 4
+O sea,
+00:14:15 Speaker 1
+Hasta ahí es como claro un poco lo que.
+00:14:18 Speaker 1
+Que se buscan ese flujo del laboratorio que van a hacer?
+00:14:23 Speaker 3
+Sí, sí,
+00:14:25 Speaker 1
+No, la verdad lo planteo así porque es muy, o sea, lo quiero que sea muy como muy sencillo en el entendimiento, ya en el hacer, pues hay hartas cositas por hacer.
+00:14:40 Speaker 2
+Señor, ¿Y vas a decir algo?
+00:14:46 Speaker 3
+Pues eh sí, pues decías.
+00:14:49 Speaker 1
+No, lo que pasa es que yo lo llamo como laboratorio porque veámoslo mas bien por este lado, porque es lo que ustedes van a ver, entonces como producto, como producto van a entregar un acta de triage, no se si te das cuenta, es esto, entonces yo que te puedo aconsejar, o sea tu puedes hacer un trabajo, un informe y en ese informe vas colocando cada una de las cosas, esa es una, la otra es que me pueden entregar por separado, pero es que no hay conectores,
+00:15:17 Speaker 1
+Sí, entonces yo prefiero que me entreguen como una especie de informe, como que tenga una línea, un objetivo, cierto, una introducción, un objetivo, el presente de trabajo tiene como objetivo hacer un acta de trias, analizar las causas de los defectos, generar un plan de mejora, cierto documento con la propuesta técnica. Sí, entonces al final.
+00:15:38 Speaker 1
+Lo que mejor funciona es un informe en donde cada cada parte del informe tenga cada uno de estos aspectos,
+00:15:46 Speaker 2
+Sí.
+00:15:47 Speaker 2
+Entonces, unas entradas,
+00:15:49 Speaker 1
+Lo que se evidenció,
+00:15:51 Speaker 1
+Lo que se validó en el trias, lo que se analizó. He visto en anteriores grupos, me han entregado una carpeta y en la carpeta básicamente me entregan,
+00:16:02 Speaker 2
+Profe, todavía no, un laboratorio muy temprano para comer,
+00:16:14 Speaker 1
+Carpeta uno las entradas. Lo que se hizo, las pruebas, los hallazgos, mire,
+00:16:19 Speaker 2
+Tal, una carpeta que se dice,
+00:16:22 Speaker 1
+Un favorcito donde yo entro y veo la tablita de ella, dígale a su mamá que le abra la tabla.
+00:16:31 Speaker 1
+Después encuentro otra tabla, otro Excel, otra carpeta donde me dicen, miren, este es el análisis de las causas,
+00:16:38 Speaker 1
+Del por qué de las causas que se validó y ta y al final un plan de mejora, que es otro documento, entonces.
+00:16:46 Speaker 1
+Cristian, ahí si te lo dejo a libre decisión. Mi consejo para manera más práctica y que me quede a mi también mucho más fácil. A veces calificar es hacer un solo documento y me ponen anexos o simplemente van colocando estas evidencias ahí.
+00:17:04 Speaker 1
+Es como lo aconsejo que lo hagas, vale.
+00:17:09 Speaker 1
+Gracias, listo.
+00:17:11 Speaker 1
+Listo, entonces.
+00:17:14 Speaker 1
+Aquí precisamente traigo un ejemplo de muchos defectos que deben tener los defectos que ustedes van a empezar a trabajar. Lo primero es que esos defectos.
+00:17:29 Speaker 1
+Me los codifiquen.
+00:17:31 Speaker 1
+Sí, defecto uno, defecto dos, defecto ciento uno.
+00:17:37 Speaker 1
+Sí, entonces ahí sí ya ustedes pueden armar. He visto trabajos muy chéveres en donde hay estudiantes que me ponen una tabla de tabla de codificación,
+00:17:48 Speaker 1
+Entonces.
+00:17:50 Speaker 1
+Entonces, por ejemplo, codificar código entonces YY me y me explican la tabla, entonces la primera D es el no sé el nombre del proyecto, entonces este es el proyecto número A.¿Por qué? Porque lo por aquí me hacen una tabla de proyecto, esta proyecto A,
+00:18:05 Speaker 1
+Yo que sé software de medicina, que dónde se lo pero allá en donde citas software B.
+00:18:13 Speaker 1
+Tal y tal cosa, entonces acá simplemente ustedes lo hacen solamente con un software,
+00:18:18 Speaker 4
+Han trabajado, han hecho pruebas,
+00:18:21 Speaker 1
+O quieren o se inventan la película solo con un software, pues simplemente A guión A o no, o se arranca desde el 100.
+00:18:31 Speaker 2
+Por eso no hay problema,
+00:18:33 Speaker 1
+Eso simplemente es un consecutivo para llevar una traza.
+00:18:37 Speaker 1
+Que después sirve mucho para todo el tema de análisis, de búsqueda, de codificación, de tener en últimas todo bien organizado y codificado más que entonces siempre debe tener dos, pues el defecto debe estar bien descrito en el cliente. Con una descripción rápida, sencilla de entender.
+00:19:01 Speaker 1
+Listo, entonces pago aprobado sin resultado sencillito al grano.
+00:19:07 Speaker 1
+Sin mayor problema, descuento calculado y correctamente,
+00:19:11 Speaker 1
+Login intermitente no era spin,
+00:19:13 Speaker 1
+Botón de enviar fuera de la pantalla,
+00:19:16 Speaker 1
+Pf tarda más de 35 segundos en descargar, no sé lo que ustedes se meten en la película, me crean unos defectos, me los plasman dentro del ejercicio, yo puse mínimo 3, pero mínimo 3 es muy poquito, o sea realmente para hacer un ejercicio chévere,5 quedan bien.
+00:19:36 Speaker 1
+Impacto principal, entonces colocan, hey, esto qué impacto tiene cierto de cara al ejercicio,
+00:19:45 Speaker 1
+Afecta la operación crítica y confianza del usuario y con esto después con esto después se pueden hasta armar los KPI. Sí, esto puede ser un insumo importante.
+00:19:57 Speaker 1
+Error de negocio y cobro equivocado, el descuento calculado incorrectamente,
+00:20:03 Speaker 1
+La indisponibilidad parcial del sistema. Las personas están intentando entrar y dicen que está caído. El botón enviar fuera de la pantalla, problema o función móvil. OK, entonces ya estamos diciendo en qué PDF, degradación del servicio, evidencia inicial, captura, un time out,
+00:20:21 Speaker 1
+Datos de prueba en comparación esperada, entonces. Si esto lo están haciendo muy enfocado a las pruebas que hicieron, pues ya tienen sus famosas sí entradas. Esta sería básicamente las entradas que les mencionaba,
+00:20:34 Speaker 1
+No sé, ponen ahí ejemplos de HTTP 500 y de caídas con HTTP, si hay logs, si hay métricas de carga, pues todo eso sirve como evidencia,
+00:20:44 Speaker 1
+Capturas de problemas. O sea, ustedes pueden hacer, recuerden que puede ser data sintética, ustedes pueden inventar cosas, pueden inventarse.
+00:20:53 Speaker 1
+Que están teniendo un problema porque el objetivo al final no es que exista el problema, sino que ustedes sepan cómo es pues clasificar.
+00:21:03 Speaker 1
+Después de eso,
+00:21:05 Speaker 1
+Después de eso, pues están las famosas evidencias, sí, las evidencias, pues no es más que poner en cada esto que les mencionaba acá atrás.
+00:21:18 Speaker 1
+Esto que les mencionaba acá, pero pues como como con una carpetica o como con.
+00:21:23 Speaker 1
+Una fotico normalmente en la vida práctica,
+00:21:29 Speaker 1
+Ese tipo de efectos o como lo manejan en mi organización actualmente es dejan un hallazgo de un book y al lado ponen un video, ponen un pantallazo, ponen un informe del book y ahí está todo lo que las capturas y hay que capturar tráfico y comprar el debug, lo que sea.
+00:21:50 Speaker 1
+Que simplemente es como OK, si tienes un pago aprobado, si no es que me brilla y me refleja en la cara, entonces me toca trabajar así o que salió todo en blanco, lo que sea que que haya que mostrar. Ay, venga, ahí login intermitente en horas picos. Ah, OK, se probó y miren, aquí tenemos un 500, tenemos un time out,
+00:22:09 Speaker 1
+Tenemos un pool ocupado, lo que sea que nos reporte el el navegador.
+00:22:15 Speaker 1
+Motor de enviar fuera de la pantalla, pues muéstrame, mándame un pantallazo.
+00:22:20 Speaker 1
+Y que el pdf tarda mucho tiempo, no sé, si no tiene un contador, un video o lo que sea.
+00:22:28 Speaker 1
+Entonces esto es como de cara a las evidencias.
+00:22:32 Speaker 1
+Después de eso hay que validar, hay que revisar cada defecto y entonces hay que responder algunas preguntas o validaciones.
+00:22:48 Speaker 1
+Que se hacen normalmente en los procesos de de los.
+00:22:52 Speaker 1
+De los qué? De lo triage, sí, entonces revisar cada defecto, entonces yo lo que quiero muchachos es que ustedes cada defecto le hagan un zoom.
+00:23:03 Speaker 1
+Sí, si se inventaron que el defecto es.
+00:23:07 Speaker 1
+Que el botón.
+00:23:09 Speaker 1
+Está fuera de la pantalla cuando ingresan en X, no sé en iPhone, sí funciona, pero en Android no.
+00:23:16 Speaker 1
+Y se inventan ahí el book, entonces empezar a mirar y a validar. OK, ese book tiene reproducibilidad, es decir, ocurre siempre, solo algunas veces, solo con ciertas condiciones. Entonces esto puede ser un cuadro en donde esté el book y ponen un campo que se llama reproducida y ponen solamente pasa con celulares Android. OK, esto qué esto sirve mucho porque al final esto se convierte.
+00:23:44 Speaker 1
+Insumo para todos, tanto para el que lo reporta como para el que lo analiza, como para el que lo va a arreglar, listo impacto, bloquea una transacción crítica, afecta datos o genera pérdidas, sí, entonces es como decir, OK, esto genera un impacto a nivel de negocio.
+00:24:02 Speaker 1
+Qué alcance tiene? Afecta uno, varios, todos los usuarios, entonces aquí se le puede dar un porcentaje.
+00:24:09 Speaker 1
+Si tenemos unas aquí, pues aquí obviamente ustedes no van a tener eso, pero por ejemplo, el caso es Esto solamente se reproduce en Android.¿Cuántos usuarios entran a Android en el mes o de qué porcentaje? No sé, estamos hablando de 70% Android,
+00:24:26 Speaker 1
+30% IOS.
+00:24:29 Speaker 1
+Entonces, ¿qué afecta? Afecta el 70% de las personas que ingresan a la aplicación,
+00:24:34 Speaker 1
+Algo así.
+00:24:36 Speaker 1
+Estoy dando un ejemplo, pueden haber muchas cosas y puede cambiar. Si yo me voy.
+00:24:41 Speaker 1
+Entonces, aunque el pdf tarda más de 35 segundos,
+00:24:46 Speaker 1
+A quién afecta? Pues normalmente ese tipo de afectación puede ser a todos,
+00:24:52 Speaker 1
+Entonces afecta a todos los usuarios en el momento o si son franjas, pues también en el alcance, afecta a todos, pero solamente en X o Y franja de horario durante el día.
+00:25:07 Speaker 1
+Bien, después viene la urgencia,
+00:25:10 Speaker 1
+Entonces aquí se puede confundir a veces o se puede más bien esto por ejemplo,
+00:25:17 Speaker 1
+Yo les doy acá un consejo para esto, lo que pueden hacer también que puede servir y es muy útil,
+00:25:25 Speaker 1
+Es para hacer esto me hacen una tabla,
+00:25:30 Speaker 2
+Ah espérame porque yo tengo creo que un Excel En un segundo yo busco rápidamente.
+00:25:40 Speaker 2
+Si.
+00:25:42 Speaker 2
+Todavía lo tengo por ahí, esperen un momento, miremoslo acá.
+00:25:49 Speaker 4
+Y esto es calidad de software. A ver, a ver si en este lo tengo.
+00:26:18 Speaker 1
+No, aquí tengo es el otro que es el diagrama de Ichihuaca,
+00:26:26 Speaker 1
+Este es chévere para el tema, ya ahorita se los explico,
+00:26:29 Speaker 1
+Pero no, bueno, entonces busquemos uno, entonces que eso es súper sencillo,
+00:26:34 Speaker 1
+Es una tabla,
+00:26:37 Speaker 2
+Es una tabla de impacto.
+00:26:48 Speaker 1
+Eso mire es un es un algo así Cristian y estimados estudiantes entonces ustedes pueden generar una tablita en donde ponen con base en esta tabla voy a darle prioridad a mis ¿A mis qué? A mis defectos entonces la llaman así prioridad de tabla de urgencia e impacto.
+00:27:17 Speaker 1
+Esto así normalmente uno los clasifica más chévere, entonces uno dice, ah, OK, si la prioridad es alta y el impacto es, perdón, si el impacto es alto y la urgencia es alta, uno, si está por acá, entonces los clasifico, entonces defecto uno vengo, lo meto acá, defecto, lo meto acá.
+00:27:36 Speaker 1
+Defecto 3 puede que también quede acá, sí, dependiendo, entonces alto, medio, bajo, esto está como portugués, entonces prioridad.
+00:27:47 Speaker 1
+Baja o prioridad alta pero el la urgencia es baja ¿Sí? También hay otra que es este es impacto, urgencia a esta que esta va impacto, prioridad y urgencia, que también son tres conceptos, por aquí yo estoy colocando impacto, urgencia, prioridad no, pero también se puede manejar, entonces aquí ya es prioridad alta, prioridad media,
+00:28:17 Speaker 1
+Prioridad baja, sí, dependiendo el cruce que uno que uno quiera hacer.
+00:28:22 Speaker 1
+Sí, son estrategias, son maneras de de realizarlo. Entonces, si hay algo que es importante y no urgente y urgente, entonces se hace primero.
+00:28:34 Speaker 1
+Si hay algo que es importante,
+00:28:36 Speaker 1
+Pero no es urgente, se puede hacer más tarde. Si hay algo que es urgente, pero no es importante, lo puedo delegar.
+00:28:44 Speaker 1
+Y si hay algo que no es urgente y no es importante, no es ni para qué, sí, y a veces pasa eso en las en las prioridades que uno hace. Pues ya, venga, esto lo pidieron hace seis meses. La vez pasada me ocurrió con un equipo de soporte que se hizo en una de las de los comités, Cristian, estábamos hablando de los casos más viejos y había un caso que llevaba seis meses,
+00:29:07 Speaker 1
+Seis meses, caso de soporte. Entonces, como y ese caso que no es que hace falta que Pepito.
+00:29:14 Speaker 1
+No, esa vaina ya no lo, eso no lo necesita, o sea, como es que un caso lleva seis meses sin solución, eso ya no es, se necesita, ya en seis meses han pasado muchas cosas,
+00:29:24 Speaker 1
+Entonces, no, no, eso ya, cierra esa vaina, y si dicen algo, si en seis meses no lloraron como ahorita si van a decir algo, entonces algo muy parecido puede pasar acá,¿Listo? Entonces, matriz de impacto y esfuerzo, ahí hay varias maneras de verlo,
+00:29:41 Speaker 1
+Pero puede hacer una estrategia para que lo trabajen dentro de su informe y les ayudar mucho a organizar.
+00:29:50 Speaker 1
+Listo, entonces íbamos en urgencia, no se puede esperar componente. salida a producción, qué tan urgente puede ser, entonces ahí les aconsejo utilizar la matriz, el work around, si existe alternativa temporal, si la prioridad puede ajustarse, si hay algo adicional que se pueda hacer mientras se soluciona la causa, si la el impacto real, entonces sí,
+00:30:16 Speaker 1
+Mientras se soluciona ese tema se está haciendo manual o yo que sé,
+00:30:22 Speaker 2
+O a ver,
+00:30:23 Speaker 1
+Pensemos por acá, Ah, sí, él no está generando recibos, entonces lo que estamos haciendo es que todas las noches se descargan todos los pagos y se corre un proceso en donde se ejecuta manualmente y él envía por correo los recibos. Yo qué sé, estoy hablando aquí de carretazo, pero el workaround precisamente se trabaja mucho en empresas organizadas y en este tipo de ejercicios y se dice, OK, listo. Cuéntame cuál es las alternativas,
+00:30:55 Speaker 1
+Los plan B que tenemos ante ante ellos.
+00:30:59 Speaker 1
+Y evidencia la decisión debe sustentarse en datos o en intuiciones, ojo, esto es súper clave en los defectos. Sí, no, no es ay, es que yo tengo, es que yo creo que es a mí y siempre me pasa, es a mí, eso no le pasa a nadie más, solo me pasa a mí, entonces yo intuyo que tengo mala suerte y que el software no me quiere, no sé, cosas de ese estilo, eso no, eso son cosas ambiguas.
+00:31:20 Speaker 1
+Listo, qué más van a tener presente entonces? Ah, miren, aquí estaría entonces.
+00:31:26 Speaker 1
+La severidad versus prioridad, cierto, entonces severidad, claramente cogemos y se envía el impacto técnico funcional del defecto, qué tan grave es el daño. Prioridad, mide la urgencia, la corrección según el riesgo del negocio, release o usuarios,
+00:31:41 Speaker 1
+Qué tan rápido quiero que lo hagamos, qué tan prioritario es. Listo, en el caso del botón mal alineado, debe tener una severidad media,
+00:31:48 Speaker 1
+Pero prioridad alta si impide finalizar la inscripción masiva, si eso está impidiendo continuar, pues es Obviamente es una prioridad alta, hay que hacerlo rápido.
+00:31:56 Speaker 1
+Sí, hay que poderlo actuar de manera rápida al momento de desplegar. Ya si es un error raro pero destructivo, puede tener severidad crítica y prioridad alta, aunque aparezca pocas veces y es dependiendo. No es que a muchos usuarios no les está dejando comprar tal producto metiéndonos por el lado del ecommerce.¿Oiga, cómo así? O sea que yo estoy perdiendo ventas solo por no, pues esa vaina es crítica, para mí sería crítico. que estoy perdiendo plata, todo lo que involucre perder dinero explícitamente eso ya es crítico,
+00:32:27 Speaker 1
+Porque con eso pago su sueldo, con eso sí cosas de ese estilo, hay que pintarlo así a veces en la práctica pintando así.
+00:32:35 Speaker 1
+Y entonces lo que les decía,
+00:32:36 Speaker 1
+La escala sugerida de severidad.
+00:32:41 Speaker 1
+Se puede poner baja, media, alta, crítica. Esta es una sugerencia,
+00:32:47 Speaker 1
+Como vimos por acá, a veces se pone solamente alta, media y baja.
+00:32:51 Speaker 1
+Sí, es otra manera de verlo.
+00:32:54 Speaker 1
+Entonces ahí sí se los dejo a su libre elección. Sí, aquí hay cuatro ítems.
+00:32:59 Speaker 1
+Yo normalmente en la empresa donde yo trabajo trabajamos con tres, es alta, es media o es baja en otra empresa que conocí al mucho tiempo, siempre era alta, como era alta y media.
+00:33:09 Speaker 1
+Sí, no, no había nada abajo, sino alta y media, eso ya depende del negocio y depende los líderes y depende los sistemas,
+00:33:15 Speaker 2
+Etcétera.
+00:33:16 Speaker 1
+Entonces y dependiendo de cada una, pues obviamente, pues tiene una definición. caída total, corrupción de datos, pérdida económica, incumplimiento, algo legal, algo por acá,
+00:33:25 Speaker 1
+No que esa funcionalidad que no sirve, ese efecto afecta, hay un impacto en el negocio y en el usuario. Sí, entonces mire que hay una línea muy delgada entre esta y esta, por eso hay que saber la diferencia. A veces es mejor poner alta, media y baja, porque algunas empresas lo crítico ya es cuando hay temas legales, no que me pueden demandar, puedo perder plata, además de la plata que estoy perdiendo por acá, me pueden demandar que esta vaina toca arreglarla ya, o sea, no hay tiempo y esto entonces por eso se puede manejar.
+00:33:49 Speaker 1
+Pues baja, que es algo ya menor, que no es el impacto, que puede pasarle solo a X o Y casos de uso, etcétera, etcétera.
+00:33:57 Speaker 1
+Entonces todo esto les sirve a ustedes muchachos para cada vez ir manejando y entonces.
+00:34:03 Speaker 1
+Lo pueden acomodar según la,
+00:34:07 Speaker 1
+Digamos que la prioridad sugerida, que entonces acá ya pueden poner unos códigos,
+00:34:11 Speaker 2
+Un P1, P2, un P3,
+00:34:13 Speaker 1
+Un P4 y ahí lo pueden colocar, se hace inmediato, se trabaja en el ciclo actual, se hace en el próximo sprint o se deja por allá guardadito en el baglio cuando tengamos tiempo de hacerlo, listo que entonces sería de mayor urgencia a menor urgencia, es como las prioridad uno, prioridad dos, prioridad tres, prioridad cuatro es un poco como pueden manejarlo a nivel de codificación, sí, y entonces ya teniendo eso.
+00:34:38 Speaker 1
+Aquí está la matriz de impacto de urgencia, la sugerida, esta es una matriz que se sugiere desde acá, pero ya saben que hay muchas maneras de hacerlo y van a encontrar muchas técnicas,
+00:34:48 Speaker 1
+Pero que al final van a llegar al mismo propósito. Entonces, severidad, es una matriz grande, alta, entonces ok, severidad alta. Entonces, ¿por qué alta? Ah, perdón, aquí en este caso es severidad,¿cierto? Y la urgencia, entonces prioridad y urgencia, entonces alta severidad, baja prioridad, alta severidad, alta prioridad, baja severidad, baja prioridad y dependiendo de cada una se clasifica. Entonces ustedes pueden coger esta tablita,
+00:35:13 Speaker 1
+La asocian a su trabajo y clasifican sus defectos. Entonces, y defecto lo pongo acá y aquí lo ponen, lo ponen defecto o lo codifican entonces no sé a-101 acá aquí va el a-103 aquí va el a-104 y aquí va el a100 o aquí van todos o a unos acá y otros acá si eso ya depende del análisis que ustedes hagan y de cómo se lo valiento después de eso me hacen el paso de clasificación.
+00:35:46 Speaker 1
+Sí, que es como, o sea, para llegar uno a un buen, a una buena priorización,
+00:35:51 Speaker 1
+Pues uno también lo que hace es antes de como cerrar ese ciclo importante del triage, cierto, y de lo que se va a cerrar en esa, en esa acta de triage, pues uno dice, bueno, a nivel de negocio y a nivel técnico se pierde dinero, tiempo, confianza, Hay fecha crítica de matrícula de pago, o sea, hay algo que se viene que nos puede llegar a afectar dependiendo de la película que se imaginen si es para una universidad, pues entonces se vienen las matrículas, nos toca corregirlo antes de las matrículas, si es un ecommerce OK toca corregirlo para el Black Friday,
+00:36:23 Speaker 1
+Que es la otra semana, yo que sé listo se compromete una obligación institucional, hay algo legal de por medio, etcétera a nivel de negocio. Son preguntas que se pueden ustedes hacer al momento de clasificar y sobre lo técnico. se dañan datos, se dañan las integraciones, qué es lo que está pasando en ese BUC, el sistema se cae, no responde o responde lentamente, cuéntenme bien qué es lo que que sí, o sea, definamos bien ese defecto, clasifiquémoslo bien, se puede reproducir con facilidad, sí, un poco como esas guías para poder.
+00:36:51 Speaker 1
+Definir y revisar bien el defecto, sí, como hacerle un zoom a cada una de estas acá.
+00:36:57 Speaker 1
+Listo y entonces aquí ya pasamos a decidir cierto o a o a generar Una clasificación ya a nivel de triage,
+00:37:08 Speaker 1
+Sí de OK,
+00:37:11 Speaker 1
+Ya pasamos la revisión de la evidencia, ya discutimos el impacto,
+00:37:15 Speaker 1
+Sí, ya se acordó una decisión, entonces ya hay una corrección, una investigación, etcétera. Se asigna un responsable, entonces acá todo esto que fuimos haciendo al final se convierte como en una tabla con responsable, evidencia, impacto, decisión, fecha y un criterio de cierre que debe ser cómo se valida.
+00:37:34 Speaker 1
+Que funcionó, entonces en este caso es pues una prueba, entonces hay que tener una famosa prueba,
+00:37:42 Speaker 1
+A ver cómo la llama uno. Normalmente son las famosas pruebas después de corregir el VIX, cierto, esa puede ser, también la puede uno llamar como pruebas de humo, aunque las pruebas de humo son más de luego de que salió a producción, ya se corren, no se hacen en producción, pero con datos sintéticos.
+00:37:58 Speaker 1
+Estas son pruebas normales que se hacen después de hacer una actualización.
+00:38:02 Speaker 1
+Listo, entonces con eso.
+00:38:04 Speaker 1
+Ya tienen ustedes el insumo para poder realizar un triage, ya la manera en que me lo van a entregar, un formatico dentro del trabajo,
+00:38:11 Speaker 1
+Ahí lo pueden investigar, ya ustedes pueden hasta buscar en Google y ahí buscan una acta de triage y llenan el formato y me lo pasan.
+00:38:18 Speaker 2
+También les vale.
+00:38:20 Speaker 1
+Listo, lo importante es que tenga todos estos pasos. Eso es como lo clave.
+00:38:26 Speaker 1
+Listo, ahora vamos a validar la famosa espina, ah no mentiras, espina de pescado no, vamos a validar cómo encontrar la causa raíz, cómo profundizar ante un evento,¿Sí? O ante un defecto, ante un problema, ante un incidente.
+00:38:48 Speaker 1
+Entonces, ¿Cuál es el objetivo acá? Profundizar progresivamente hasta encontrar la causa pausible y verificable en lugar de quedarse con el síntoma.
+00:38:57 Speaker 1
+Regla, cada respuesta debe ser concreta, basada en evidencia conectada lógicamente de la anterior.
+00:39:03 Speaker 1
+Listo, entonces esa es básicamente el el la los cinco porqués 5 wise.
+00:39:10 Speaker 1
+Y entonces por qué entonces que no es que se está está fallando el sistema?
+00:39:15 Speaker 1
+Ok, y por qué no es que se está validando y las conexiones hacia X lugar, hacia la base de datos no funcionan.
+00:39:23 Speaker 1
+Ok, entonces y por qué? No, porque todo al final funciona, no se genera un time out o cosas de ese estilo, entonces llega uno, empieza a preguntar hasta que llegue a la raíz, a la raíz del asunto.
+00:39:35 Speaker 1
+Entonces, por ejemplo, acá creo que hay un ejemplo, entonces síntoma.
+00:39:40 Speaker 1
+El login falla con HTTP 500 en horas. Ok, listo, pues cuando van a entrar al moodle de la universidad no les está dejando loguear a las 6 en punto de la tarde, que es cuando tienen las primeras clases de nocturnos.
+00:39:53 Speaker 1
+Bueno,¿Por qué? No es que ya verificamos si se agota el pool de conexiones a la base de datos.
+00:39:58 Speaker 1
+Tenemos ahí una restricción, yo que sé.¿Y por qué pasa eso? No es que los intentos que terminan en timeout no liberan su conexión.
+00:40:08 Speaker 1
+Ah, se quedan pegados.¿Por qué? No, es que el manejo de los errores no cierra la conexión en la ruta de excepción, se queda ahí ambiguo, tiene una, no hay un cierre a nivel de lógica del software y se está quedando ahí en un bucle, entonces se están quedando pegadas las sesiones.¿Y por qué? No, pues en las pruebas de carga no se simulan fallos de este tipo, por eso nunca nos habíamos dado cuenta que eso podía pasar.
+00:40:31 Speaker 1
+Ah, y al final encontraron que la causa raíz es el no exige una prueba de carga antes de cada release. Entonces para poder saber esto en un entorno de pruebas, porque aquí estamos hablando de calidad de software,
+00:40:46 Speaker 1
+Es porque no se dieron cuenta en las pruebas,
+00:40:48 Speaker 1
+Llega uno a esa, a ese.
+00:40:51 Speaker 1
+A ese qué, a esa causa raíz. Ah, ok, es decir que si yo a la próxima quiero saber cuántos usuarios me pueden aceptar en horas pico, pues tengo que en el pipeline poner una prueba de carga simulando x usuarios para saber que pues ese es el tráfico que yo tenía listo.
+00:41:09 Speaker 1
+Es un poco el ejemplo Cristian ahí de cómo se maneja, pero lo importante es que tengas la conciencia que existe una estrategia de los 5 porqués aplicados a, en este caso el 5 porque aplicado al defecto tal. Por cada defecto me hacen uno de estos.
+00:41:27 Speaker 1
+Bien y también entonces se realiza.
+00:41:33 Speaker 1
+Esta es una manera, entonces qué pueden hacer, qué otra manera hay de hacer.
+00:41:40 Speaker 1
+La otra manera es a través de la famosa esquina de pescado o conocida como Ichikawa,
+00:41:47 Speaker 2
+La Ichikawa.
+00:41:48 Speaker 1
+Entonces aquí lo que se busca.
+00:41:50 Speaker 1
+Es como al final, déjame que a mí me gusta un poco acá, como ponerlo en contexto. Entonces aquí uno pone el defecto, sellos defectuosos en la bolsa de 1 kg, no sé si empieza uno a buscar diferentes factores, mano de obra, métodos, maquinarias, medición, materia prima, medio ambiente. Sí, entonces acá, OK, listo a nivel de. de mano de obra, por qué nos puede estar fallando este, por qué nos puede estar afectando? Ah, no, falta de capacitación,
+00:42:22 Speaker 1
+Hay falta de sensibilización. Ah, ve a nivel del medio ambiente, que no temperaturas, sí, es decir, se mira, pero desde varias aristas y ya viendo desde el punto de vista, ahora sí, de software y software, que eso ya obviamente se adapta, es lo mismo hablar de un proceso defectuoso de una bolsa que se tienen en cuenta unos factores, hablar de software, ya en el software se habla de personas, procesos, herramientas, entornos, datos, pues el código y el diseño. Es como la manera un poco eh homóloga a lo que antes se maneja.
+00:42:53 Speaker 1
+Lo que pasa es que esa espina de pescado nace es de procesos manuales, de producción, esto por ejemplo en la industria.
+00:43:00 Speaker 1
+Entonces uno pone acá el problema,
+00:43:02 Speaker 1
+Causas, causas y empieza uno ir de lo macro a lo guico. Sí. Eh problema, categoría, categoría, texto, ejemplo, ejemplo, sí, y va uno como encontrando y haciendo.
+00:43:16 Speaker 1
+Alusión al por qué de este problema, si hay muchas causas que ocasionan esta situación,
+00:43:21 Speaker 1
+Entonces al final esta también es una herramienta que por favor la trabajan, quiero verla dentro del ejercicio que van a hacer, hacen una matriz, una causa, pueden hacer lo siguiente, pueden coger un defecto si hacen cinco defectos, entonces a tres de ellos le aplican los cinco porqués y a otros dos le aplican la esquina de pescado. pueden ahí turnarse, o es que cada defecto hagan uno y el otro no, se pueden turnar sin problema. Dejo la claridad y ahí queda en la grabación para que lo tengan presente.
+00:43:53 Speaker 1
+Listo.
+00:43:56 Speaker 1
+El plan de mejora, ya vamos a ir como sintetizando un poco.
+00:44:02 Speaker 1
+Entonces en el plan de mejora pues vamos a tener una acción,
+00:44:06 Speaker 1
+Cierto, se debe indicar que se previene, que se corrige, cuál es la acción a seguir.
+00:44:13 Speaker 1
+Responsable persona.
+00:44:15 Speaker 1
+Quién lo va a realizar? Si si la acción es hacer otra prueba, pues entonces va a ser el área de QA, si la acción va a ser ejecutar un fix, entonces cuándo se va a hacer, quién lo va a hacer, qué esfuerzo medio, bajo, alto, dependiendo lo que ya se definió y qué KPI se busca.
+00:44:32 Speaker 1
+Ah, bueno, al final lo que se definió es que se va a hacer una prueba de carga en el pilot.
+00:44:37 Speaker 1
+Ah, listo, quién lo va a hacer? Ah, lo va a hacer el líder de QA.
+00:44:40 Speaker 1
+Bien, qué esfuerzo va a necesitar? No, el man tiene que configurar todo eso y pues un esfuerzo medio y qué se busca al final, que el qué indicador se va a buscar ahí? Ah, se va a buscar que la latencia quede en un percentil 95 menor a 300 milisegundos. Pues mire que ya todo lo que hemos visto se va concatenando al final en un plan de acción de mejora.
+00:45:01 Speaker 1
+Y eso entonces ese aquí también hay otra.
+00:45:07 Speaker 1
+Otra herramienta que pueden utilizar, que es la priorización de impacto y esfuerzo, aquí ya es bajo el esfuerzo,
+00:45:12 Speaker 1
+Entonces impacto alto y esfuerzo bajo, etcétera, etcétera. Sí, esto es como una herramienta de adicional.
+00:45:18 Speaker 1
+Qué KPIs?
+00:45:20 Speaker 1
+Qué KPIs pueden existir? Sí, entonces. Un segundito que por aquí me escribieron algo que pena Cristian.
+00:45:30 Speaker 1
+Entonces, ¿qué KPIs son útiles? Es error gate porcentajes de solicitudes fallidas, los mismos que vimos en las pruebas que hicieron, esos se pueden convertir en KPI o si si quieren otro tipo de KPI, pues también se puede validar, pero en esencia es esto, es Ah, OK, menos del 1% en el error, en el error, en el radio de error. Ah, que las latencias en las pruebas sea menor a 300 milisegundos para llegar a un percentivo 25. Ah, que la cobertura en el smog validar todos los flujos críticos que estén protegidos y una automatización de un más de un 80% de todas las pantallas que existen dentro del.
+00:46:03 Speaker 1
+Entonces, al final son ejemplos de campage, ejemplos de campage que pueden utilizar, que existen mucho más, obviamente, dependiendo de la película que ustedes también se sinteticen.
+00:46:15 Speaker 1
+Y entonces también les estoy pidiendo las como las los Quality Gates, cierto, que en últimas se convierten en puntos de chequeo, en esos semáforos de código y calidad Flujos críticos, entonces aquí si ya les aconsejo, entonces no sé, por ejemplo, flujos críticos, es aprobados, error de gay, latencia en código y calidad puede ser, no sé, nuevo código mayor al 80% si exige al menos,
+00:46:47 Speaker 1
+No sé, el 80% de las nuevas líneas de código estén cubiertas por una prueba unitaria. Digamos acá, eso significaría un poco el coverage, el código nuevo.
+00:46:57 Speaker 1
+Sí, a los issues críticos o bloqueantes cero. Entonces, no sé, cero tolerancia a vulnerabilidades de seguridad,
+00:47:05 Speaker 1
+Fallos graves, bloqueantes a nivel de seguridad, debe estar en cero al momento de hacerle las pruebas.
+00:47:13 Speaker 1
+Duplicidad en el nuevo código, ojo, venga, hay que limitar la cantidad de código duplicado,
+00:47:19 Speaker 1
+Sí que permita, pues en últimas mantener, pues el las buenas prácticas de desarrollo y eso debe estar en menos de 3% y ya hay software que se encarga de verificar eso.
+00:47:29 Speaker 1
+Listo. Entonces por acá, ah, OK, que el error, el radio de error sea menor al 1 por ciento, entonces que el porcentaje de errores por transacciones o peticiones que se envíen,
+00:47:38 Speaker 2
+Pues se califiquen.
+00:47:40 Speaker 1
+Y entonces, después de toda esa película, cierto, pues al final es como un ejemplo acá.
+00:47:48 Speaker 1
+De cómo se puede, cómo lo podemos al final llevar a un a un proceso de si hay si hay.
+00:47:59 Speaker 1
+En donde se automatiza un pipeline, se controla, se hace un paso a paso de cómo se aplica un flujo de desarrollo.
+00:48:10 Speaker 1
+Entonces va el flujo de desarrollo con las pruebas,
+00:48:15 Speaker 1
+Los quality gates que se plantearon y al final pues el despliegue. Y si eso se cumple, pues arriba en producción,
+00:48:24 Speaker 2
+Si no se cumple, pues no,
+00:48:28 Speaker 1
+Se hace como tal un proceso de despliegue, entonces a nivel de pruebas, entonces ah, OK, aquí podemos poner validaciones automatizadas de pruebas a nivel de Quality Gate, ya lo vimos, el punto de control, cierto, precisamente vimos acá. Ah, OK, que nos cumpla esto que definimos acá y estos flujos críticos deben estar contemplados y si no, pues no, y eso todo eso yo lo puedo automatizar, cristian, entonces yo acá en el trabajo.
+00:48:53 Speaker 1
+Precisamente, pues no, no, lo que quiero es que ustedes.
+00:48:57 Speaker 1
+Validen propuestas,
+00:48:59 Speaker 1
+Detallen umbrales y justifiquen para una automatización de un pilot. Si lo hacen genial, sería un punto a favor de su trabajo. Si ustedes me automatizan eso y me entregan un trabajo ya automatizado con un pilot, pues genial, y lo veo corriendo o me envían los pantallazos, pues estupendo.
+00:49:16 Speaker 1
+Pero sé que eso conlleva bastante trabajo, etcétera, que se puede hacer para un solo defecto podrían hacer el ejercicio y sería súper chévere. Sí, pero acá es OK.¿Qué herramientas hay en el mercado que pueden ayudar a esto? Sí, una investigación un poco que ustedes vayan y validen.¿Y qué me ayuda a hacer eso?
+00:49:34 Speaker 2
+Listo, y vamos por acá, listo,
+00:49:38 Speaker 1
+No, eso creo que con esto ya doy por cerrado un poco. Eso era lo que más o menos quería,
+00:49:45 Speaker 1
+Quería mostrarte.
+00:49:48 Speaker 1
+Quería mostrarles a los estudiantes para que les quede mucho más clara.
+00:49:52 Speaker 1
+La actividad que se va, que se va a desarrollar.
+00:49:55 Speaker 1
+Pues claramente al ser solo tuve el estudiante Cristian, pues me rinde más el tiempo y hay menos preguntas y pero hasta ahí queda claro, o sea, queda como claro un poco.
+00:50:04 Speaker 1
+Yo sé que viendo la grabación y las personas que la van a observar,
+00:50:06 Speaker 2
+Pues ahí como que un hallazgo,
+00:50:10 Speaker 1
+Unas evidencias para que puedan hacer al final su trabajo.
+00:50:16 Speaker 3
+El profe sigue una isla para poder realizar su trabajo. Muchas gracias. Estamos en un preguntas inmediatas.
+00:50:28 Speaker 1
+Si quieren, voy a dejar aquí en el en el chat del grupo.
+00:50:34 Speaker 1
+Voy a dejar aquí en el chat de grupo estas diapositivas para que las puedas consultar y te sirvan de guía y el profe dijo esto, entonces hagámoslo entonces contenido, voy a juntartelo acá de una vez que después se me olvida y para los que obviamente.
+00:50:49 Speaker 1
+Van a ver la clase, también lo van a poder descargar, se meten ahí en la grabación y ahí aparece con los contenidos que se compartieron en la grabación. La vez pasada me explicaron eso, entonces genial.
+00:50:58 Speaker 1
+Listo, me avisas si ya te llegó ahí en contenido.
+00:51:10 Speaker 5
+En qué parte propio contenido,
+00:51:11 Speaker 1
+Pero te metes a donde dice, es tienes la aplicación instalada? Sí, o es web.
+00:51:18 Speaker 1
+Sí, yo lo tengo, te metes allá en la parte derecha, dice, están los 3 punticos y ahí hay lo que dice contenido.
+00:51:29 Speaker 3
+Ya estoy entrando a ver.
+00:51:31 Speaker 2
+Mira a ver si te deja descargar.
+00:51:49 Speaker 3
+Mensajería reuniones llamadas en la aplicación de web.
+00:51:52 Speaker 2
+Sí? Sí, sí, aplicación de web.
+00:51:55 Speaker 2
+Dale contenido,
+00:51:57 Speaker 1
+Aparece un puntico y aparece contenido.
+00:52:14 Speaker 1
+Bueno, ¿Te apareció?
+00:52:19 Speaker 3
+Parece mensajería, reuniones, llamadas, equipos y aplicaciones,
+00:52:25 Speaker 1
+Configuración si quieres compárteme solo para revisar porque me hace raro igual si quieres aquí voy redactando ahí en el foro si nos va a complicarnos avisos.
+00:52:39 Speaker 2
+Voy a poner en avisos, sí voy a poner aquí añadir tema,
+00:52:42 Speaker 1
+Material.
+00:52:45 Speaker 1
+Clase, esta cuál clase es?
+00:52:47 Speaker 2
+Este es el encuentro que 6.
+00:52:50 Speaker 1
+Cómo material clase 15 de octubre?
+00:52:55 Speaker 1
+Esto aquí adjunto 45.
+00:52:56 Speaker 3
+El encuentro 5. Listo.
+00:53:02 Speaker 1
+Elegir archivo, listo, ya lo pongo ahí en el ya lo pongo ahí en el foro, en el avisos, vale.
+00:53:08 Speaker 1
+Descargas, aunque si quieres compartir porque me dejas con la duda vale porque ya yo siempre entro por la web,
+00:53:17 Speaker 2
+Tengo que cambiar para abrir web aunque creo que encontré una manera más fácil dale clic ahí a ese link a ver si te abre ah bueno.
+00:53:41 Speaker 5
+Escucha profe? Sí eso bueno la voy a convertir para que vea ahí sabe no hay pantalla?
+00:53:50 Speaker 2
+Sí eso mire casi en webs a ver métete al métete al no métete a la a la donde estamos en la clase allá donde dice calidad de software dale clic por ahí y dale chat.
+00:54:11 Speaker 1
+Te aparecen los punticos y puedes dejarme ver a donde como esta pantalla donde estoy yo hablando no te la deja ver porque estamos compartiendo.
+00:54:22 Speaker 5
+Sí, yo creo que sí.
+00:54:23 Speaker 2
+A ver, no, si no te la deja ver por lo que estás compartiendo.
+00:54:29 Speaker 1
+No, no importa, dale click al link que te envía ahí a ver en el chat, ahí detrás en ese chat, dale click a ese link.
+00:54:33 Speaker 5
+Ese es el profe que me abrió educado.
+00:54:35 Speaker 1
+Ah, entonces no es,
+00:54:36 Speaker 2
+Es ese, es que falta nada.
+00:54:41 Speaker 5
+No y y al darle click se vio que me salió un error ahí yo lo intenté abrir pero mire, es este ¿No?
+00:54:49 Speaker 2
+Ah espérame que me estoy viendo si,
+00:54:53 Speaker 1
+Dale click a ese pero ¿Será que necesita que esté bloqueado o qué?
+00:54:58 Speaker 5
+Tal cual invalid user si lo pones por favor esta vez es un navegador que yo tengo no pues tampoco y acá bueno acá yo estoy loqueado ¿No?
+00:55:11 Speaker 5
+Hasta ahí.
+00:55:12 Speaker 2
+Sí, ahí estás loqueado.
+00:55:14 Speaker 2
+Déjame, vuelvo y lo cargo a ver si después cargo el mío.
+00:55:18 Speaker 5
+Pero en el foro ya sale.
+00:55:21 Speaker 1
+Pues yo te lo voy a poner, espérame a ver.
+00:55:22 Speaker 5
+Sí, es más fácil en el foro.
+00:55:26 Speaker 5
+Pues yo la verdad nunca nunca he visto que suban contenido digamos ahí como en las grabaciones creo que muy pocas veces he visto.
+00:55:35 Speaker 5
+La verdad.
+00:55:38 Speaker 1
+Dame un segundo porque es que yo estoy copiando el link,
+00:55:41 Speaker 2
+El que estás compartiendo, yo estoy copiando el link directamente del repositorio del foro,
+00:55:47 Speaker 4
+Entonces para su actividad 5,
+00:56:07 Speaker 1
+Cierto, la actividad 5 es la que vamos a hacer si actividad 5.
+00:56:23 Speaker 2
+A ver, ta Iremos a ver, entonces ahí enviar a Ford Listo, échate la mirada y miro tu pantalla Metete a calidad de software, eso metete a visas No, lo mande buen a visas Es donde yo normalmente pongo las cosas.
+00:56:55 Speaker 2
+Dale click ahí.
+00:56:57 Speaker 1
+Y ahí está el mismo link.
+00:56:59 Speaker 2
+Dale y ahí sí abre.
+00:57:00 Speaker 1
+Ah, OK, necesita estar como indexado ahí. Listo.
+00:57:05 Speaker 1
+Qué raro.
+00:57:06 Speaker 2
+Listo, Cristian, muchas gracias.
+00:57:10 Speaker 1
+No te estoy escuchando nada nada. Dale profe.
+00:57:13 Speaker 1
+Listo, nada, pues nada, con esto damos por finalizada la metete a calidad del software,
+00:57:17 Speaker 2
+Eso metete avisos.

@@ -1,0 +1,23 @@
+# G2 — Escaneo de secretos. Extiende las reglas por defecto de gitleaks con una regla
+# específica para la causa raíz de D-001: credenciales HTTP Basic embebidas en el código.
+title = "Actividad 5 — quality gate de secretos"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "hardcoded-basic-auth"
+description = "Credencial HTTP Basic embebida en el código (causa raíz de D-001)"
+regex = '''(?i)basic\s+[a-z0-9+/]{8,}={0,2}'''
+keywords = ["basic"]
+
+[allowlist]
+description = "Las pruebas de regresión usan la credencial a propósito para verificar que se rechaza"
+paths = [
+  '''(^|/)tests/''',
+  '''(^|/)node_modules/''',
+  '''(^|/)coverage/''',
+  '''(^|/)public/''',
+  '''package-lock\.json$''',
+  '''(^|/)LICENSE$''',
+]
