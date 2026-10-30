@@ -153,105 +153,88 @@ def cmd_report(data):
     defs = data["defectos"]
     md = []
 
-    md.append("# Entradas: defectos y evidencias\n")
-    md.append("Los defectos provienen de la ejecución real del Master Test Plan de la Actividad 2 sobre Restful-Booker. "
-              "Cada uno conserva su código de origen para mantener la trazabilidad entre actividades. "
-              "Las referencias `archivo:línea` corresponden al código original, antes de las correcciones (commit `02c4ced`).\n")
-    md.append(tabla(
-        ["Código", "Origen", "Descripción", "Impacto principal", "Reproducibilidad", "Alcance", "Sev. propuesta", "Prio. inicial"],
-        [[d["id"], d["origen"], d["titulo"], d["impacto"], d["reproducibilidad"], d["alcance"],
-          d["severidad_propuesta"], d["prioridad_inicial"]] for d in defs]))
+    md.append("# Los defectos que llevamos al triage\n")
+    md.append("No inventamos defectos para esta actividad. Usamos los que encontramos al ejecutar el Master Test Plan "
+              "de la Actividad 2, cada uno con su evidencia curl. Les pusimos un código nuevo (D-001 a D-005) que se "
+              "repite en el acta, en el análisis, en el plan y en el nombre de las pruebas del pipeline, para poder "
+              "seguir cada defecto de principio a fin. Las referencias `archivo:línea` son del código original "
+              "(commit `02c4ced`).\n")
+    md.append(tabla(["Código", "Origen", "Qué pasa", "Evidencia"],
+                    [[d["id"], d["origen"].replace(" (Actividad 2)", ""), d["titulo"], f"`{d['evidencia'][0]['ref']}`"] for d in defs],
+                    [1, 2, 6, 4]))
     md.append("")
-    for d in defs:
-        md.append(f"## {d['id']} — {d['titulo']}\n")
-        md.append(f"**Módulo:** `{d['modulo']}`\n")
-        md.append(f"{d['descripcion']}\n")
-        md.append("**Pasos para reproducir:** " + " → ".join(d["pasos"]) + "\n")
-        md.append(f"**Resultado esperado:** {d['esperado']}  \n**Resultado obtenido:** {d['obtenido']}\n")
-        md.append(tabla(["Tipo", "Referencia", "Qué muestra"],
-                        [[e["tipo"], f"`{e['ref']}`", e["resumen"]] for e in d["evidencia"]], [2, 6, 7]))
-        md.append("")
 
     md.append("# Acta de triage\n")
-    md.append(f"**Fecha:** {s['fecha']} · **Modalidad:** {s['modalidad']}\n")
-    md.append("**Asistentes y roles:**\n")
-    for a in s["asistentes"]:
-        md.append(f"- {a['nombre']}: {a['rol']}")
-    md.append("\n**Escala de severidad:**\n")
-    md.append(tabla(["Severidad", "Criterio"], list(s["escala_severidad"].items())))
-    md.append("\n**Escala de prioridad:**\n")
-    md.append(tabla(["Prioridad", "Acción esperada"], list(s["escala_prioridad"].items())))
-    md.append("\n**Criterios aplicados en la sesión:**\n")
-    for c in s["criterios"]:
-        md.append(f"- {c}")
-    md.append("\n**Decisiones acordadas:**\n")
-    md.append(tabla(
-        ["Código", "Sev. acordada", "Prio. acordada", "Impacto × urgencia (matriz)", "Responsable", "Decisión", "Fecha compromiso", "Workaround", "Criterio de cierre"],
-        [[d["id"], d["triage"]["severidad"], d["triage"]["prioridad"],
-          f"{d['triage']['impacto']}×{d['triage']['urgencia']} → {prioridad_matriz(d['triage']['impacto'], d['triage']['urgencia'])}",
-          d["triage"]["responsable"], d["triage"]["decision"], d["triage"]["fecha_compromiso"],
-          d["triage"]["workaround"], d["triage"]["criterio_cierre"]] for d in defs]))
-    md.append("\n**Justificación de cada decisión:**\n")
+    nombres = " y ".join(a["nombre"] for a in s["asistentes"])
+    md.append(f"Hicimos la sesión el {s['fecha']} ({s['modalidad'].lower()}). Asistimos {nombres}. "
+              f"{s['asistentes'][0]['nombre'].split()[0]} moderó y {s['asistentes'][1]['nombre'].split()[0]} llevó el registro.\n")
+    md.append("Para decidir separamos dos preguntas. La severidad responde a qué tan grave es el daño (seguridad, datos, "
+              "operación) y la prioridad a qué tan pronto hay que actuar. Para la prioridad usamos la matriz "
+              "impacto × urgencia de clase y tuvimos en cuenta si había workaround, la reproducibilidad y el esfuerzo. "
+              "Acordamos también que ningún defecto se cierra sin su prueba de regresión `D-00X` en verde dentro del pipeline.\n")
+    md.append(tabla(["Escala", "Significado"],
+                    [[k, v] for k, v in s["escala_severidad"].items()] + [[k, v] for k, v in s["escala_prioridad"].items()],
+                    [1, 8]))
+    md.append("\n**Decisiones**\n")
+    md.append(tabla(["Código", "Sev.", "Prio.", "Responsable", "Decisión", "Fecha compromiso"],
+                    [[d["id"], d["triage"]["severidad"], d["triage"]["prioridad"], d["triage"]["responsable"],
+                      d["triage"]["decision"], d["triage"]["fecha_compromiso"]] for d in defs],
+                    [1, 1, 1, 3, 5, 2]))
+    md.append("\n**Por qué decidimos así**\n")
     for d in defs:
-        cambio = ""
-        if (d["severidad_propuesta"], d["prioridad_inicial"]) != (d["triage"]["severidad"], d["triage"]["prioridad"]):
-            cambio = f" *(propuesta: {d['severidad_propuesta']}/{d['prioridad_inicial']} → acordada: {d['triage']['severidad']}/{d['triage']['prioridad']})*"
-        md.append(f"- **{d['id']}**{cambio}: {d['triage']['justificacion']}")
-    md.append("\n**Hallazgos adicionales de la sesión:**\n")
+        t = d["triage"]
+        md.append(f"- **{d['id']} {t['severidad']}/{t['prioridad']}.** {t['justificacion']} "
+                  f"Workaround: {t['workaround'][0].lower() + t['workaround'][1:]}")
+    md.append("\n**Otras cosas que salieron en la sesión**\n")
     for h in s["hallazgos_de_la_sesion"]:
         md.append(f"- {h}")
-    md.append("\n**Seguimiento del estado:**\n")
-    md.append(tabla(["Código", "Estado", "Fecha de cierre", "Prueba de regresión"],
-                    [[d["id"], ESTADO.get(d["status"], d["status"]), d.get("fecha_cierre") or "—", d["regression_test"]] for d in defs]))
     md.append("")
 
     md.append("# Análisis de causa raíz\n")
-    md.append("A cada defecto priorizado se le aplicaron los **5 porqués** (profundidad causal) y el **diagrama de Ishikawa** "
-              "(amplitud de causas concurrentes por categoría). Cada causa se marca como **verificada** (con evidencia: "
-              "código `archivo:línea`, log o prueba) o como **suposición por validar**. El análisis es *blameless*: "
-              "las causas apuntan a procesos y sistemas, no a personas.\n")
+    md.append("Para cada defecto hicimos los 5 porqués, que sirven para bajar hasta la causa, y un diagrama de Ishikawa, "
+              "que sirve para ver qué otras causas aportaron. En los diagramas marcamos con ✔ las causas que pudimos "
+              "comprobar con código, logs o pruebas, y con ? las que todavía son suposiciones. Tratamos de no culpar a "
+              "nadie: buscamos qué falló en el proceso.\n")
     for d in defs:
-        md.append(f"## {d['id']} — {d['titulo']}\n")
-        md.append("**5 porqués**\n")
-        md.append(tabla(["#", "Pregunta", "Respuesta"],
-                        [[i + 1, w["pregunta"], w["respuesta"]] for i, w in enumerate(d["cinco_porques"])], [1, 8, 12]))
+        md.append(f"## {d['id']}: {d['titulo']}\n")
+        for i, w in enumerate(d["cinco_porques"]):
+            md.append(f"{i + 1}. {w['respuesta']}")
         md.append(f"\n**Causa raíz:** {d['causa_raiz']}\n")
-        md.append("**Diagrama de Ishikawa**\n")
-        md.append(f"![Ishikawa {d['id']}](img/ishikawa_{d['id']}.png){{width=100%}}\n")
-        rows = []
-        for cat, causas in d["ishikawa"].items():
+        evid = []
+        for causas in d["ishikawa"].values():
             for c in causas:
-                rows.append([cat, c["causa"], "Verificada" if c["tipo"] == "verificada" else "Suposición por validar", c["evidencia"]])
-        md.append(tabla(["Categoría", "Causa", "Estado", "Evidencia / cómo validar"], rows, [2, 6, 3, 6]))
-        md.append("")
+                if c["tipo"] == "verificada" and c["evidencia"] not in evid:
+                    evid.append(c["evidencia"])
+        md.append(f"**Evidencia de las causas verificadas:** {'; '.join(evid[:3])}.\n")
+        md.append(f"![Ishikawa {d['id']}](img/ishikawa_{d['id']}.png){{width=72%}}\n")
 
     md.append("# Plan de mejora\n")
-    md.append("Las acciones se ordenan con la matriz **impacto/esfuerzo**: primero los *quick wins* (alto impacto, bajo esfuerzo) y "
-              "luego los proyectos planificados. Cada acción tiene un KPI con umbral y, cuando aplica, el quality gate que lo "
-              "verifica de forma automática.\n")
-    md.append("![Matriz impacto/esfuerzo](img/matriz_impacto_esfuerzo.png){width=80%}\n")
+    md.append("Ubicamos cada acción en la matriz impacto/esfuerzo. Primero van los quick wins (mucho impacto, poco "
+              "esfuerzo) y después lo que hay que planear con más tiempo. Cada acción tiene un KPI con su umbral y, "
+              "cuando se puede, un gate del pipeline que lo revisa solo.\n")
+    md.append("![Matriz impacto/esfuerzo](img/matriz_impacto_esfuerzo.png){width=60%}\n")
     acciones = [(cuadrante(a), d["id"], a) for d in defs for a in d["acciones"]]
     acciones.sort(key=lambda x: (x[0][0], -NIVEL[x[2]["impacto"]], x[2]["plazo"]))
-    md.append(tabla(
-        ["Orden", "Acción", "Defecto", "Tipo", "Descripción", "Responsable", "Impacto", "Esfuerzo", "Plazo", "KPI", "Umbral", "Gate", "Cuadrante"],
-        [[i + 1, a["id"], did, a["tipo"], a["accion"], a["responsable"], a["impacto"], a["esfuerzo"], a["plazo"],
-          a["kpi"], a["umbral"], a["gate"] or "—", q[1]] for i, (q, did, a) in enumerate(acciones)]))
+    md.append(tabla(["#", "Acción", "Def.", "Responsable", "Imp./Esf.", "Plazo", "KPI → umbral", "Gate"],
+                    [[i + 1, f"**{a['id']}** {a['accion']}", did, a["responsable"].split(" (")[0],
+                      f"{a['impacto']}/{a['esfuerzo']}", a["plazo"], f"{a['kpi']} → {a['umbral']}", a["gate"] or "—"]
+                     for i, (q, did, a) in enumerate(acciones)],
+                    [1, 9, 2, 3, 2, 2, 6, 1]))
     md.append("")
 
-    md.append("# Quality gates propuestos\n")
-    md.append(tabla(
-        ["Gate", "Etapa", "Nombre", "Qué mide", "Umbral", "Por qué este umbral", "Previene", "Herramienta", "Si falla"],
-        [[g["id"], g["etapa"], g["nombre"], g["mide"], g["umbral"], g["justificacion"],
-          ", ".join(g["previene"]) or "—", g["herramienta"], g["si_falla"]] for g in data["gates"]]))
-    md.append("")
-
-    md.append("# Matriz de trazabilidad\n")
+    md.append("# Quality gates\n")
+    md.append("Cada gate convierte un criterio de cierre o un KPI en una regla que el pipeline revisa en cada cambio. "
+              "Van ordenados de lo más barato a lo más caro, y si uno falla los siguientes no corren.\n")
+    md.append(tabla(["Gate", "Qué revisa", "Umbral", "Herramienta"],
+                    [[f"**{g['id']}** {g['nombre']}", g["mide"], g["umbral"], g["herramienta"]] for g in data["gates"]],
+                    [3, 5, 5, 4]))
+    md.append("\n**Trazabilidad**\n")
     gates_por_def = {d["id"]: sorted({g["id"] for g in data["gates"] if d["id"] in g["previene"]}) for d in defs}
-    md.append(tabla(
-        ["Defecto", "Evidencia", "Sev./Prio.", "Causa raíz", "Acciones", "Prueba de regresión", "Gates", "Estado"],
-        [[d["id"], d["evidencia"][0]["ref"], f"{d['triage']['severidad']}/{d['triage']['prioridad']}", d["causa_raiz"],
-          ", ".join(a["id"] for a in d["acciones"]), d["regression_test"], ", ".join(gates_por_def[d["id"]]), ESTADO.get(d["status"], d["status"])]
-         for d in defs]))
+    md.append(tabla(["Defecto", "Acciones", "Prueba", "Gates", "Estado"],
+                    [[d["id"], ", ".join(a["id"] for a in d["acciones"]), f"`{d['regression_test']} …`",
+                      ", ".join(gates_por_def[d["id"]]),
+                      ESTADO.get(d["status"], d["status"]) + (f" ({d['fecha_cierre']})" if d.get("fecha_cierre") else "")]
+                     for d in defs]))
     md.append("")
 
     INFORME.mkdir(exist_ok=True)

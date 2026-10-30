@@ -1,11 +1,11 @@
-@page { size: A4 landscape; margin: 14mm 12mm; }
+@page { size: A4; margin: 16mm 15mm; }
 body { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 10pt; line-height: 1.4; color: #1d1d1f; max-width: none; margin: 0; }
 header#title-block-header { text-align: center; margin: 25mm 0 10mm; page-break-after: always; }
 h1.title { font-size: 22pt; } .subtitle { font-size: 14pt; color: #444; } .author, .date { font-size: 11pt; }
 nav#TOC { page-break-after: always; }
 h1 { font-size: 16pt; color: #1f4e79; border-bottom: 2px solid #1f4e79; padding-bottom: 3px; margin-top: 26px; }
 h2 { font-size: 12.5pt; color: #2c6fad; margin-top: 18px; }
-table { border-collapse: collapse; width: 100%; margin: 8px 0 14px; font-size: 8pt; page-break-inside: auto; }
+table { border-collapse: collapse; width: 100%; margin: 8px 0 14px; font-size: 7.8pt; page-break-inside: auto; }
 tr { page-break-inside: avoid; }
 th { background: #1f4e79; color: #fff; text-align: left; }
 th, td { border: 1px solid #b7c4d3; padding: 3px 5px; vertical-align: top; }

@@ -39,4 +39,4 @@ Local gates require `gitleaks`, `k6`, Python 3 and Node 22. `.github/workflows/q
 - Rejected bookings return **500** on POST (pre-existing behavior, logged as a P4 observation in the acta). That's why tests assert `status >= 400` instead of 400. PUT returns 400.
 - D-004 (overlapping bookings) is deliberately open as Crítica/P2. Its test is `it.skip`, so G1 doesn't block on it.
 - `.gitleaks.toml` has a custom `hardcoded-basic-auth` rule. `tests/` is allowlisted because the regression tests use that credential on purpose.
-- Git history is part of the evidence: commit `02c4ced` is the red state and `2389430` the green fix. Logs are in `triage/evidencia/pipeline_0{1,2}_*.log`. The report cites these hashes, so don't rewrite history.
+- Git history is part of the evidence: commit `02c4ced` is the red state and `68e8805` the green fix (published history: workflow `6c87c84`, PR #1 on github.com/contracamilo/actividad5-triage-quality-gates; the pre-publication hashes survive in local tag `historial-local-original`). Logs are in `triage/evidencia/pipeline_0{1,2}_*.log`. The report cites these hashes, so don't rewrite history.

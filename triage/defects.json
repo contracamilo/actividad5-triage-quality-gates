@@ -10,7 +10,7 @@
   },
   "sesion": {
     "fecha": "2026-10-30",
-    "modalidad": "Sesión de triage virtual (60 min)",
+    "modalidad": "virtual, 60 minutos",
     "asistentes": [
       {
         "nombre": "Camilo Rivera Quintero",
@@ -42,9 +42,9 @@
       "Análisis sin culpa (blameless, Google SRE): se buscan fallas de proceso y de sistema, no responsables individuales."
     ],
     "hallazgos_de_la_sesion": [
-      "Tres pruebas existentes de tests/spec.js afirman el comportamiento defectuoso (aceptar el Basic hardcodeado en PUT y DELETE, y responder 405 al borrar un id inexistente). La suite 'pasaba en verde' precisamente porque protegía los defectos. Se decide reescribirlas junto con la corrección.",
-      "POST /booking responde 500 (error de servidor) cuando la validación falla, en lugar de 400. Se registra como observación para backlog (P4), sin código propio en este ciclo, porque cambiarlo rompe el contrato con clientes existentes y requiere acordarlo.",
-      "Hallazgo del propio pipeline: al implementar el gate G2, npm audit detectó 7 vulnerabilidades en dependencias de producción (1 crítica en proxy-addr, 2 altas en body-parser y path-to-regexp). Se corrigieron con actualizaciones minor/patch (npm audit fix; body-parser 2.4.0, morgan 1.12.1, uuid 13.0.2) y la suite siguió en verde. Queda una moderada en validate.js sin parche disponible: riesgo aceptado bajo el umbral 'high' y mitigado por la acción A-07 (reemplazar validate.js por un esquema JSON)."
+      "Tres pruebas de tests/spec.js comprobaban el comportamiento defectuoso: aceptaban el Basic en PUT y DELETE y esperaban 405 al borrar un id inexistente. Por eso la suite pasaba. Decidimos reescribirlas junto con las correcciones.",
+      "POST /booking responde 500 cuando la validación falla, cuando debería ser 400. Lo dejamos como observación P4 en el backlog, porque cambiarlo rompe el contrato con los clientes actuales y hay que acordarlo antes.",
+      "Al montar el gate G2, npm audit encontró 7 vulnerabilidades en dependencias de producción: una crítica (proxy-addr) y dos altas (body-parser y path-to-regexp). Las corregimos actualizando versiones y las pruebas siguieron pasando. Queda una moderada en validate.js que no tiene parche. La aceptamos como riesgo porque está por debajo del umbral y la acción A-07 la elimina al reemplazar validate.js."
     ]
   },
   "defectos": [
@@ -96,8 +96,8 @@
         "responsable": "Camilo Rivera Quintero (backend)",
         "decision": "Hotfix",
         "fecha_compromiso": "2026-10-31",
-        "workaround": "Ninguno técnico. Mitigación temporal: no exponer la API públicamente hasta desplegar el hotfix.",
-        "justificacion": "Vulnerabilidad de seguridad explotable con información pública y sin workaround. Importante y urgente: se hace primero.",
+        "workaround": "no hay uno técnico. Mientras sale el hotfix, la API no debería estar expuesta en público.",
+        "justificacion": "Cualquiera puede explotarlo con información que está publicada en la documentación, y no hay forma de evitarlo sin tocar el código. Es importante y urgente, así que va primero.",
         "criterio_cierre": "La prueba de regresión 'D-001' pasa (PUT/PATCH/DELETE con el header Basic → 403; con token válido → 200/201) y el escaneo de secretos (gitleaks) no reporta credenciales en el código."
       },
       "status": "resolved",
@@ -114,7 +114,7 @@
         },
         {
           "pregunta": "¿Por qué hay un literal de credenciales en el código?",
-          "respuesta": "Porque se añadió como atajo de autenticación para pruebas/demos y nunca se separó la configuración del código; tampoco existe un módulo de autorización central, así que la lógica se copió en tres handlers."
+          "respuesta": "Porque se añadió como atajo de autenticación para pruebas/demos y nunca se separó la configuración del código. Tampoco existe un módulo de autorización central, así que la lógica se copió en tres handlers."
         },
         {
           "pregunta": "¿Por qué el atajo llegó al código que se despliega sin que nadie lo detectara?",
@@ -122,7 +122,7 @@
         },
         {
           "pregunta": "¿Por qué no existe un control de seguridad en el pipeline?",
-          "respuesta": "Porque la definición de 'hecho' y los quality gates del proyecto solo exigían que las pruebas unitarias pasaran; no hay requisitos de seguridad explícitos ni gates que los verifiquen."
+          "respuesta": "Porque la definición de 'hecho' y los quality gates del proyecto solo exigían que las pruebas unitarias pasaran. No hay requisitos de seguridad explícitos ni gates que los verifiquen."
         }
       ],
       "causa_raiz": "Ausencia de requisitos y controles de seguridad en el proceso (definición de hecho y pipeline sin escaneo de secretos), sumada a una autorización duplicada y hardcodeada en cada handler.",
@@ -256,8 +256,8 @@
         "responsable": "Karen Torres (validaciones)",
         "decision": "Corrección en el ciclo actual",
         "fecha_compromiso": "2026-11-03",
-        "workaround": "Consulta diaria de reservas con fechas invertidas y corrección manual (paliativo, no corrige la causa).",
-        "justificacion": "Se propuso P2, pero el comité la sube a P1: corrompe datos de negocio en cada uso, es 100 % reproducible y su corrección es de esfuerzo bajo.",
+        "workaround": "revisar a diario las reservas con fechas invertidas y corregirlas a mano. Eso alivia el problema pero no lo arregla.",
+        "justificacion": "Llegó como P2, pero lo subimos a P1 porque daña los datos en cada uso, pasa siempre y corregirlo cuesta poco.",
         "criterio_cierre": "La prueba de regresión 'D-002' pasa (fechas invertidas o iguales → rechazo; fechas válidas → 200) y el smoke k6 sigue en verde."
       },
       "status": "resolved",
@@ -274,11 +274,11 @@
         },
         {
           "pregunta": "¿Por qué las reglas no cubren el orden de las fechas?",
-          "respuesta": "Porque las reglas de negocio de una reserva (checkout > checkin) no están especificadas como criterio de aceptación de la API; solo existe el contrato de campos."
+          "respuesta": "Porque las reglas de negocio de una reserva (checkout > checkin) no están especificadas como criterio de aceptación de la API. Solo existe el contrato de campos."
         },
         {
           "pregunta": "¿Por qué no se detectó en pruebas?",
-          "respuesta": "Porque la suite solo prueba casos válidos con fechas correctas; no aplica partición de equivalencia ni valores límite sobre fechas."
+          "respuesta": "Porque la suite solo prueba casos válidos con fechas correctas. No aplica partición de equivalencia ni valores límite sobre fechas."
         },
         {
           "pregunta": "¿Por qué no hay pruebas de valores límite?",
@@ -402,8 +402,8 @@
         "responsable": "Karen Torres (validaciones)",
         "decision": "Corrección en el ciclo actual",
         "fecha_compromiso": "2026-11-03",
-        "workaround": "Ninguno confiable: el valor original se pierde al convertirse en null.",
-        "justificacion": "Se reclasifica de Media a Alta: no es solo falta de validación, hay pérdida silenciosa de datos financieros (pérdida económica explícita). Sin workaround → P1.",
+        "workaround": "no hay uno confiable, porque el dato original ya se perdió.",
+        "justificacion": "Lo subimos de Media a Alta. Al principio parecía una validación que faltaba, pero cuando el precio es texto se guarda null y el valor original se pierde. Como no hay workaround, quedó en P1.",
         "criterio_cierre": "La prueba de regresión 'D-003' pasa (negativo y no numérico → rechazo; 0 y valores positivos → 200)."
       },
       "status": "resolved",
@@ -420,7 +420,7 @@
         },
         {
           "pregunta": "¿Por qué el parser no detecta el NaN?",
-          "respuesta": "Porque está diseñado para transformar la salida y no valida; asume que el dato ya viene limpio (responsabilidad repartida sin contrato)."
+          "respuesta": "Porque está diseñado para transformar la salida y no valida. Asume que el dato ya viene limpio (responsabilidad repartida sin contrato)."
         },
         {
           "pregunta": "¿Por qué no hay contrato de tipos entre la entrada y la persistencia?",
@@ -539,8 +539,8 @@
         "responsable": "Camilo Rivera Quintero (diseño) + Product Owner",
         "decision": "Investigación y aclaración del requisito; corrección en el siguiente release",
         "fecha_compromiso": "2026-11-14",
-        "workaround": "Conciliación diaria de reservas con fechas superpuestas (consulta GET /booking?checkin=&checkout=) y contacto manual al cliente.",
-        "justificacion": "La severidad sigue siendo Crítica, pero la prioridad baja a P2: corregirlo exige un cambio de modelo (entidad habitación/recurso) y una decisión de negocio. Un hotfix que rechace cualquier solapamiento global bloquearía reservas legítimas. Hay workaround operativo. Es el caso donde severidad y prioridad se separan.",
+        "workaround": "cada día se buscan las reservas con fechas superpuestas (GET /booking?checkin=&checkout=) y se contacta al cliente.",
+        "justificacion": "Sigue siendo crítico, pero lo bajamos a P2. Para arreglarlo hay que agregar al modelo la idea de habitación y decidir con negocio cuándo dos reservas chocan. Un hotfix que rechace cualquier solapamiento bloquearía reservas válidas, y mientras tanto existe un workaround.",
         "criterio_cierre": "Requisito aprobado por el PO; prueba de regresión 'D-004' (misma habitación + rango solapado → 409; habitaciones distintas → 200) en verde."
       },
       "status": "open",
@@ -561,7 +561,7 @@
         },
         {
           "pregunta": "¿Por qué no se identificó la brecha de dominio antes?",
-          "respuesta": "Porque no se hizo un análisis de requisitos del dominio de reservas; los requisitos se derivaron del contrato existente de la API."
+          "respuesta": "Porque no se hizo un análisis de requisitos del dominio de reservas. Los requisitos se derivaron del contrato existente de la API."
         },
         {
           "pregunta": "¿Por qué los requisitos se derivaron del contrato?",
@@ -688,8 +688,8 @@
         "responsable": "Karen Torres",
         "decision": "Quick win: se corrige junto con D-001 porque toca el mismo handler",
         "fecha_compromiso": "2026-11-10",
-        "workaround": "Los clientes pueden tratar el 405 de DELETE como 'no existe'.",
-        "justificacion": "La matriz impacto × urgencia (2×2) sugiere P4 (backlog). El comité la sube a P3 porque rompe la automatización de los clientes de integración, y además la corrige como quick win dentro del hotfix de D-001: toca el mismo handler y el esfuerzo es mínimo (impacto bajo / esfuerzo bajo).",
+        "workaround": "los clientes pueden interpretar el 405 del DELETE como que el registro no existe.",
+        "justificacion": "Con la matriz salía P4, pero lo subimos a P3 porque rompe la automatización de quienes integran con la API. Además toca el mismo handler que D-001, así que lo corregimos en el mismo cambio.",
         "criterio_cierre": "La prueba de regresión 'D-005' pasa (DELETE de un id inexistente → 404)."
       },
       "status": "resolved",
@@ -714,7 +714,7 @@
         },
         {
           "pregunta": "¿Por qué no hay especificación de códigos de estado?",
-          "respuesta": "Porque la API no tiene un estándar de diseño de errores; es la misma causa de proceso que en D-003."
+          "respuesta": "Porque la API no tiene un estándar de diseño de errores. Es la misma causa de proceso que en D-003."
         }
       ],
       "causa_raiz": "Ausencia de un estándar de códigos de estado HTTP; las pruebas de caracterización consolidaron el comportamiento incorrecto.",
