@@ -415,7 +415,8 @@ describe('restful-booker - PUT /booking', function () {
       })
   });
 
-  it('responds with a 200 and an updated payload using auth', function testUpdatingABooking(done){
+  // D-001: antes esta prueba esperaba 200 y protegía el defecto; el header Basic hardcodeado ya no autoriza.
+  it('responds with a 403 when using the hardcoded basic auth header', function testUpdatingABookingWithBasicAuth(done){
     request(server)
       .post('/booking')
       .send(payload)
@@ -425,8 +426,7 @@ describe('restful-booker - PUT /booking', function () {
           .set('Accept', 'application/json')
           .set('Authorization', 'Basic YWRtaW46cGFzc3dvcmQxMjM=')
           .send(payload2)
-          .expect(200)
-          .expect(payload2, done);
+          .expect(403, done);
       })
   });
 
@@ -528,7 +528,8 @@ describe('restful-booker DELETE /booking', function(){
       });
   });
 
-  it('responds with a 201 when deleting an existing booking with a basic auth header', function testDeletingAValidBookingWithAuth(done){
+  // D-001: antes esperaba 201 con el header Basic hardcodeado.
+  it('responds with a 403 when deleting a booking with the hardcoded basic auth header', function testDeletingAValidBookingWithAuth(done){
     request(server)
       .post('/booking')
       .send(payload)
@@ -536,11 +537,12 @@ describe('restful-booker DELETE /booking', function(){
         request(server)
           .delete('/booking/2')
           .set('Authorization', 'Basic YWRtaW46cGFzc3dvcmQxMjM=')
-          .expect(201, done)
+          .expect(403, done)
       });
   });
 
-  it('responds with a 405 when deleting a non existing booking', function testDeletingNonExistantBooking(done){
+  // D-005: antes esperaba 405 (Method Not Allowed) para un recurso inexistente.
+  it('responds with a 404 when deleting a non existing booking', function testDeletingNonExistantBooking(done){
     request(server)
       .post('/auth')
       .send({'username': 'admin', 'password': 'password123'})
@@ -548,7 +550,7 @@ describe('restful-booker DELETE /booking', function(){
         request(server)
           .delete('/booking/10000000')
           .set('Cookie', 'token=' + res.body.token)
-          .expect(405, done)
+          .expect(404, done)
       })
   })
 

@@ -1,0 +1,16 @@
+@page { size: A4; margin: 16mm 15mm; }
+body { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 10pt; line-height: 1.4; color: #1d1d1f; max-width: none; margin: 0; }
+header#title-block-header { text-align: center; margin: 25mm 0 10mm; page-break-after: always; }
+h1.title { font-size: 22pt; } .subtitle { font-size: 14pt; color: #444; } .author, .date { font-size: 11pt; }
+nav#TOC { page-break-after: always; }
+h1 { font-size: 16pt; color: #1f4e79; border-bottom: 2px solid #1f4e79; padding-bottom: 3px; margin-top: 26px; }
+h2 { font-size: 12.5pt; color: #2c6fad; margin-top: 18px; }
+table { border-collapse: collapse; width: 100%; margin: 8px 0 14px; font-size: 7.8pt; page-break-inside: auto; }
+tr { page-break-inside: avoid; }
+th { background: #1f4e79; color: #fff; text-align: left; }
+th, td { border: 1px solid #b7c4d3; padding: 3px 5px; vertical-align: top; }
+tr:nth-child(even) td { background: #f3f6fa; }
+code { font-size: 8.5pt; background: #f1f1f1; padding: 0 2px; }
+pre { background: #f6f8fa; border: 1px solid #d0d7de; padding: 8px; font-size: 8.5pt; white-space: pre-wrap; }
+img { max-width: 100%; display: block; margin: 6px auto; }
+figure { page-break-inside: avoid; margin: 0; } figcaption { text-align: center; font-size: 8.5pt; color: #555; }

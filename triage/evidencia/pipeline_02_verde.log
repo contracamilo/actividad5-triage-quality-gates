@@ -1,0 +1,337 @@
+Quality gates — Restful-Booker (Actividad 5) — 2026-10-30 00:14:33
+Commit: 02c4ced
+
+==================================================================
+G1 — Gate de triage (defects.json)
+==================================================================
+VALIDACIÓN: OK — 5 defectos, 12 acciones, 7 gates
+G1 — Gate de triage
+Defecto  Sev.     Prio.  Estado     Prueba
+D-001    Crítica  P1     resolved   sí
+D-002    Alta     P1     resolved   sí
+D-003    Alta     P1     resolved   sí
+D-004    Crítica  P2     open       no
+D-005    Media    P3     resolved   sí
+
+RESULTADO: APROBADO — sin P1 abiertos y todos los resueltos tienen prueba de regresión
+>> G1 APROBADO
+
+==================================================================
+G2 — Escaneo de secretos (gitleaks) y dependencias (npm audit)
+==================================================================
+[90m12:14AM[0m [32mINF[0m [1mscanned ~35389 bytes (35.39 KB) in 38.2ms[0m
+[90m12:14AM[0m [32mINF[0m [1mno leaks found[0m
+# npm audit report
+
+validate.js  *
+Severity: moderate
+validate.js Regular Expression Denial of Service vulnerability - https://github.com/advisories/GHSA-rv73-9c8w-jp4c
+No fix available
+node_modules/validate.js
+
+1 moderate severity vulnerability
+
+Some issues need review, and may require choosing
+a different dependency.
+>> G2 APROBADO
+
+==================================================================
+G3+G4 — Pruebas unitarias + regresión de defectos y cobertura ≥ 80 %
+==================================================================
+
+
+  restful-booker
+[0mGET /ping [32m201[0m 2.791 ms - 7[0m
+    ✔ responds to /ping
+Error: Not Found
+    at /Users/home/Documents/universidad/calidad en software/acti-5-cal/app/app.js:22:15
+    at Layer.handleRequest (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:342:13)
+    at /Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:297:9
+    at processParams (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:582:12)
+    at next (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:291:5)
+    at /Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:688:15
+    at next (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:276:14)
+    at router.handle (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:186:3)
+    at router (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:60:12)
+    at Layer.handleRequest (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:342:13)
+    at /Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:297:9
+    at processParams (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:582:12)
+    at next (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:291:5)
+    at xmlbodyparser (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/express-xml-bodyparser/lib/types/xml.js:76:14)
+    at Layer.handleRequest (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:342:13)
+    at /Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:297:9
+    at processParams (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:582:12)
+    at next (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:291:5)
+    at SendStream.error (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/serve-static/index.js:120:7)
+    at SendStream.emit (node:events:514:28)
+    at SendStream.error (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/send/index.js:168:17)
+    at SendStream.onStatError (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/send/index.js:315:12)
+    at next (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/send/index.js:621:16)
+    at onstat (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/send/index.js:609:14)
+    at FSReqCallback.oncomplete (node:fs:197:21) {
+  status: 404
+}
+[0mGET /foo/bar [33m404[0m 0.898 ms - 9[0m
+    ✔ 404 everything else
+
+  restful-booker - GET /booking
+[0mPOST /booking [33m418[0m 4.733 ms - 12[0m
+[0mPOST /booking [33m418[0m 0.411 ms - 12[0m
+[0mGET /booking [32m200[0m 0.596 ms - 33[0m
+    ✔ responds with all booking ids when GET /booking
+[0mPOST /booking [33m418[0m 0.230 ms - 12[0m
+[0mPOST /booking [33m418[0m 0.178 ms - 12[0m
+[0mGET /booking?firstname=Geoff [32m200[0m 0.238 ms - 17[0m
+    ✔ responds with a subset of booking ids when searching by firstname date
+[0mPOST /booking [33m418[0m 0.248 ms - 12[0m
+[0mPOST /booking [33m418[0m 0.152 ms - 12[0m
+[0mGET /booking?lastname=White [32m200[0m 0.216 ms - 17[0m
+    ✔ responds with a subset of booking ids when searching by lastname date
+[0mPOST /booking [33m418[0m 0.189 ms - 12[0m
+[0mPOST /booking [33m418[0m 0.123 ms - 12[0m
+[0mGET /booking?checkin=2013-02-01 [32m200[0m 0.274 ms - 17[0m
+    ✔ responds with a subset of booking ids when searching for checkin date
+[0mPOST /booking [33m418[0m 0.171 ms - 12[0m
+[0mPOST /booking [33m418[0m 0.139 ms - 12[0m
+[0mGET /booking?checkout=2013-02-05 [32m200[0m 0.233 ms - 33[0m
+    ✔ responds with a subset of booking ids when searching for checkout date
+[0mPOST /booking [33m418[0m 0.134 ms - 12[0m
+[0mPOST /booking [33m418[0m 0.122 ms - 12[0m
+[0mPOST /booking [33m418[0m 0.101 ms - 12[0m
+[0mGET /booking?checkin=2013-02-01&checkout=2013-02-06 [32m200[0m 0.266 ms - 33[0m
+    ✔ responds with a subset of booking ids when searching for checkin and checkout date
+[0mPOST /booking [33m418[0m 0.206 ms - 12[0m
+[0mPOST /booking [33m418[0m 0.136 ms - 12[0m
+[0mPOST /booking [33m418[0m 0.176 ms - 12[0m
+[0mGET /booking?firstname=Geoff&lastname=White&checkin=2013-02-01&checkout=2013-02-06 [32m200[0m 0.327 ms - 17[0m
+    ✔ responds with a subset of booking ids when searching for name, checkin and checkout date
+RangeError: Invalid time value
+    at Date.toISOString (<anonymous>)
+    at /Users/home/Documents/universidad/calidad en software/acti-5-cal/app/routes/index.js:112:73
+    at Layer.handleRequest (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/lib/layer.js:152:17)
+    at next (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/lib/route.js:117:3)
+    at handle (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:435:11)
+    at Layer.handleRequest (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/lib/layer.js:152:17)
+    at /Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:295:15
+    at processParams (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:582:12)
+    at next (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:291:5)
+    at router.handle (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:186:3)
+    at router (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:60:12)
+    at Layer.handleRequest (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:342:13)
+    at /Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:297:9
+    at processParams (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:582:12)
+    at next (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:291:5)
+    at xmlbodyparser (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/express-xml-bodyparser/lib/types/xml.js:76:14)
+    at Layer.handleRequest (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/lib/layer.js:152:17)
+    at trimPrefix (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:342:13)
+    at /Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:297:9
+    at processParams (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:582:12)
+    at next (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/router/index.js:291:5)
+    at SendStream.error (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/serve-static/index.js:120:7)
+    at SendStream.emit (node:events:514:28)
+    at SendStream.error (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/send/index.js:168:17)
+    at SendStream.onStatError (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/send/index.js:315:12)
+    at next (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/send/index.js:621:16)
+    at onstat (/Users/home/Documents/universidad/calidad en software/acti-5-cal/app/node_modules/send/index.js:609:14)
+    at FSReqCallback.oncomplete (node:fs:197:21)
+[0mGET /booking?checkout=2013-02-0 [31m500[0m 0.385 ms - 21[0m
+    ✔ responds with a 500 error when GET /booking with a bad date query string
+[0mPOST /booking [33m418[0m 0.152 ms - 12[0m
+[0mGET /booking/1 [32m200[0m 0.376 ms - 170[0m
+    ✔ responds with a payload when GET /booking/{id}
+[0mPOST /booking [33m418[0m 0.203 ms - 12[0m
+[0mGET /booking/1 [32m200[0m 0.239 ms - 341[0m
+    ✔ responds with an XML payload when GET /booking/{id} with accept application/xml
+
+  restful-booker - POST /booking
+[0mPOST /booking [32m200[0m 0.123 ms - 196[0m
+    ✔ responds with the created booking and assigned booking id
+[0mPOST /booking [32m200[0m 1.682 ms - 196[0m
+    ✔ responds with the created booking and assigned booking id when sent an XML payload
+[0mPOST /booking [31m500[0m 0.467 ms - 21[0m
+    ✔ responds with a 500 error when a bad payload is sent
+[0mPOST /booking [33m418[0m 0.133 ms - 12[0m
+[0mPOST /booking [32m200[0m 0.139 ms - 196[0m
+    ✔ responds with the correct assigned booking id when multiple payloads are sent
+[0mPOST /booking [32m200[0m 0.194 ms - 451[0m
+    ✔ responds with an XML payload when POST /booking with accept application/xml
+[0mPOST /booking [32m200[0m 0.115 ms - 196[0m
+    ✔ responds with a 200 when a payload with too many params are sent
+[0mPOST /booking [33m418[0m 0.157 ms - 12[0m
+    ✔ responds with a 418 when using a bad accept header
+
+  restful-booker POST /auth
+[0mPOST /auth [32m200[0m 0.258 ms - 27[0m
+    ✔ responds with a 200 and a token to use when POSTing a valid credential
+[0mPOST /auth [32m200[0m 0.101 ms - 28[0m
+    ✔ responds with a 200 and a message informing of login failed when POSTing invalid credential
+
+  restful-booker - PUT /booking
+[0mPUT /booking/1 [33m403[0m 0.115 ms - 9[0m
+    ✔ responds with a 403 when no token is sent
+[0mPOST /auth [32m200[0m 0.145 ms - 28[0m
+[0mPUT /booking/1 [33m403[0m 0.278 ms - 9[0m
+    ✔ responds with a 403 when not authorised
+[0mPOST /booking [33m418[0m 0.131 ms - 12[0m
+[0mPOST /auth [32m200[0m 0.141 ms - 27[0m
+[0mPUT /booking/1 [32m200[0m 0.548 ms - 170[0m
+    ✔ responds with a 200 and an updated payload
+[0mPOST /booking [33m418[0m 0.174 ms - 12[0m
+[0mPUT /booking/1 [33m403[0m 0.089 ms - 9[0m
+    ✔ responds with a 403 when using the hardcoded basic auth header
+[0mPOST /auth [32m200[0m 0.119 ms - 27[0m
+[0mPUT /booking/100000 [33m405[0m 0.198 ms - 18[0m
+    ✔ responds with a 405 when attempting to update a booking that does not exist
+[0mPOST /booking [33m418[0m 0.138 ms - 12[0m
+[0mPOST /auth [32m200[0m 0.123 ms - 27[0m
+[0mPUT /booking/1 [32m200[0m 0.303 ms - 170[0m
+    ✔ responds with a 200 and an updated payload when requesting with an XML
+[0mPOST /booking [33m418[0m 0.164 ms - 12[0m
+[0mPOST /auth [32m200[0m 0.105 ms - 27[0m
+[0mPUT /booking/1 [32m200[0m 0.216 ms - 341[0m
+    ✔ responds with an XML payload when PUT /booking with accept application/xml
+
+  restful-booker DELETE /booking
+[0mDELETE /booking/1 [33m403[0m 0.113 ms - 9[0m
+    ✔ responds with a 403 when not authorised
+[0mPOST /auth [32m200[0m 0.108 ms - 28[0m
+[0mDELETE /booking/1 [33m403[0m 0.075 ms - 9[0m
+    ✔ responds with a 403 when not authorised
+[0mPOST /booking [33m418[0m 0.125 ms - 12[0m
+[0mPOST /auth [32m200[0m 0.120 ms - 27[0m
+[0mDELETE /booking/1 [32m201[0m 0.250 ms - 7[0m
+    ✔ responds with a 201 when deleting an existing booking
+[0mPOST /booking [33m418[0m 0.148 ms - 12[0m
+[0mDELETE /booking/2 [33m403[0m 0.052 ms - 9[0m
+    ✔ responds with a 403 when deleting a booking with the hardcoded basic auth header
+[0mPOST /auth [32m200[0m 0.106 ms - 27[0m
+[0mDELETE /booking/10000000 [33m404[0m 0.072 ms - 9[0m
+    ✔ responds with a 404 when deleting a non existing booking
+
+  Actividad 5 - regresión de defectos triados
+    D-001 escritura sin autenticación real (header Basic hardcodeado)
+[0mPOST /booking [32m200[0m 0.159 ms - 195[0m
+[0mPUT /booking/1 [33m403[0m 0.130 ms - 9[0m
+[0mGET /booking/1 [32m200[0m 0.232 ms - 169[0m
+      ✔ D-001 PUT con el header Basic hardcodeado responde 403 y no modifica la reserva
+[0mPOST /booking [32m200[0m 0.144 ms - 195[0m
+[0mPATCH /booking/1 [33m403[0m 0.117 ms - 9[0m
+      ✔ D-001 PATCH con el header Basic hardcodeado responde 403
+[0mPOST /booking [32m200[0m 0.123 ms - 195[0m
+[0mDELETE /booking/1 [33m403[0m 0.058 ms - 9[0m
+[0mGET /booking [32m200[0m 0.173 ms - 17[0m
+      ✔ D-001 DELETE con el header Basic hardcodeado responde 403 y la reserva sigue existiendo
+[0mPOST /booking [32m200[0m 0.167 ms - 195[0m
+[0mPOST /auth [32m200[0m 0.130 ms - 27[0m
+[0mPUT /booking/1 [32m200[0m 0.200 ms - 176[0m
+      ✔ D-001 con un token válido de /auth la escritura sigue funcionando
+    D-002 fechas de reserva invertidas
+[0mPOST /booking [31m500[0m 0.182 ms - 21[0m
+[0mGET /booking [32m200[0m 0.183 ms - 2[0m
+      ✔ D-002 rechaza checkout anterior a checkin y no persiste la reserva
+[0mPOST /booking [31m500[0m 0.105 ms - 21[0m
+      ✔ D-002 rechaza checkout igual a checkin (0 noches)
+[0mPOST /booking [31m500[0m 0.092 ms - 21[0m
+      ✔ D-002 rechaza fechas que no son válidas
+[0mPOST /booking [32m200[0m 0.134 ms - 195[0m
+[0mPOST /auth [32m200[0m 0.145 ms - 27[0m
+[0mPUT /booking/1 [33m400[0m 0.174 ms - 11[0m
+      ✔ D-002 PUT con fechas invertidas responde 400
+[0mPOST /booking [32m200[0m 0.119 ms - 195[0m
+      ✔ D-002 valor límite: una noche (checkout = checkin + 1 día) se acepta
+    D-003 totalprice inválido
+[0mPOST /booking [31m500[0m 0.164 ms - 21[0m
+[0mGET /booking [32m200[0m 0.161 ms - 2[0m
+      ✔ D-003 rechaza totalprice negativo
+[0mPOST /booking [31m500[0m 0.148 ms - 21[0m
+[0mGET /booking [32m200[0m 0.131 ms - 2[0m
+      ✔ D-003 rechaza totalprice no numérico en lugar de convertirlo en null
+[0mPOST /booking [32m200[0m 0.115 ms - 193[0m
+      ✔ D-003 valor límite: totalprice 0 se acepta
+    D-004 reservas solapadas (abierto, P2: pendiente de aclarar el requisito)
+      - D-004 una segunda reserva solapada de la misma habitación responde 409
+    D-005 código de estado al borrar un recurso inexistente
+[0mPOST /auth [32m200[0m 0.134 ms - 27[0m
+[0mDELETE /booking/10000000 [33m404[0m 0.070 ms - 9[0m
+      ✔ D-005 DELETE de una reserva inexistente responde 404
+
+
+  46 passing (114ms)
+  1 pending
+
+---------------------|---------|----------|---------|---------|-------------------------------------
+File                 | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                   
+---------------------|---------|----------|---------|---------|-------------------------------------
+All files            |   89.77 |    76.53 |      65 |   89.77 |                                     
+ helpers             |      77 |    74.19 |      50 |      77 |                                     
+  bookingcreator.js  |      36 |      100 |       0 |      36 | 4,8,12-14,18-20,24-26,30-50         
+  parser.js          |      90 |    58.82 |     100 |      90 | 42,44,46,49-50,81,83,88-89          
+  validationrules.js |     100 |      100 |     100 |     100 |                                     
+  validator.js       |   94.11 |     90.9 |     100 |   94.11 | 7-8                                 
+ models              |   80.55 |    56.25 |     100 |   80.55 |                                     
+  booking.js         |   80.55 |    56.25 |     100 |   80.55 | ...23,33-34,47-48,55-56,60-61,70-71 
+ routes              |   94.32 |    84.31 |      50 |   94.32 |                                     
+  index.js           |   94.32 |    84.31 |      50 |   94.32 | 19-32,119,189,194-195,451,565-583   
+---------------------|---------|----------|---------|---------|-------------------------------------
+>> G3+G4 APROBADO
+
+==================================================================
+G5 — Smoke de rendimiento k6 (error < 1 %, p95 < 300 ms, checks > 99 %)
+==================================================================
+
+
+  █ THRESHOLDS 
+
+    checks
+    ✓ 'rate>0.99' rate=100.00%
+
+    http_req_duration
+    ✓ 'p(95)<300' p(95)=8.48ms
+
+    http_req_failed
+    ✓ 'rate<0.01' rate=0.00%
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 1200    39.478898/s
+    checks_succeeded...: 100.00% 1200 out of 1200
+    checks_failed......: 0.00%   0 out of 1200
+
+    ✓ crear reserva válida → 200
+    ✓ precio persistido (D-003)
+    ✓ consultar reserva → 200
+    ✓ actualizar con token → 200 (D-001)
+
+    HTTP
+    http_req_duration..............: avg=3.77ms min=175µs med=3.36ms max=10.98ms p(90)=7.39ms p(95)=8.48ms
+      { expected_response:true }...: avg=3.77ms min=175µs med=3.36ms max=10.98ms p(90)=7.39ms p(95)=8.48ms
+    http_req_failed................: 0.00%  0 out of 901
+    http_reqs......................: 901    29.642073/s
+
+    EXECUTION
+    iteration_duration.............: avg=1.01s  min=1s    med=1.01s  max=1.02s   p(90)=1.01s  p(95)=1.01s 
+    iterations.....................: 300    9.869725/s
+    vus............................: 10     min=10       max=10
+    vus_max........................: 10     min=10       max=10
+
+    NETWORK
+    data_received..................: 345 kB 11 kB/s
+    data_sent......................: 229 kB 7.5 kB/s
+
+
+
+>> G5 APROBADO
+
+==================================================================
+G6 — Despliegue condicionado
+==================================================================
+Todos los gates en verde: se habilita el despliegue (simulado: docker build en CI).
+>> G6 APROBADO
+
+RESULTADO FINAL: VERDE (2026-10-30 00:15:05)

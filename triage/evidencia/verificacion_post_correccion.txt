@@ -1,0 +1,27 @@
+Verificación posterior a la corrección — 2026-10-30 00:15 — mismos casos de la evidencia original (A2)
+
+=== T03 / D-001: PUT solo con header Basic hardcodeado (antes 200) ===
+HTTP 403
+
+=== T-DELETE-01 / D-001: DELETE solo con header Basic (antes 201) ===
+HTTP 403
+
+=== T01 / D-002: checkout anterior a checkin (antes 200) ===
+Internal Server Error
+HTTP 500
+
+=== T04 / D-003: totalprice -50 (antes 200) ===
+Internal Server Error
+HTTP 500
+
+=== T04b / D-003: totalprice "abc" (antes 200 con null) ===
+Internal Server Error
+HTTP 500
+
+=== T05 / D-005: DELETE id inexistente con token (antes 405) ===
+HTTP 404
+
+=== Control: reserva válida y PUT con token (debe seguir funcionando) ===
+{"bookingid":1,"booking":{"firstname":"Ok","lastname":"Valida","totalprice":120,"depositpaid":true,"bookingdates":{"checkin":"2026-12-01","checkout":"2026-12-05"}}}
+HTTP 200
+PUT con token: HTTP 200
